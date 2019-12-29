@@ -27,7 +27,7 @@
           </defs>
         </svg>
         <v-card>
-          <div class="blur">
+          <div class="blur unselectable">
             <Editor
               v-model="opponentInput"
               @init="editorInit"
@@ -53,7 +53,11 @@ export default {
       userInput: "",
       opponentInput: "",
       opponentInputOptions: {
-        readOnly: true
+        readOnly: true,
+        highlightActiveLine: false,
+        highlightSelectedWord: false,
+        cursorStyle: "ace",
+        selectionStyle: "text"
       },
       io: null,
       theme: "chrome",
@@ -78,6 +82,7 @@ export default {
       require("brace/mode/java"); //language
       require("brace/mode/less");
       require("brace/theme/chrome");
+      require("brace/theme/twilight");
       require("brace/snippets/javascript"); //snippet
     }
   },
@@ -102,5 +107,9 @@ export default {
 }
 .blur-svg {
   display: none;
+}
+
+.unselectable {
+    pointer-events: none;
 }
 </style>

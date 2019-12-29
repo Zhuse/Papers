@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import store from './store'
-import vuetify from './plugins/vuetify';
+import Vuetify from './plugins/vuetify';
 import VueSocketIO from 'vue-socket.io'
 
 Vue.use(new VueSocketIO({
@@ -13,8 +13,9 @@ Vue.use(new VueSocketIO({
       mutationPrefix: 'SOCKET_'
   }
 }))
+
 new Vue({
   store,
-  vuetify,
+  Vuetify,
   render: h => h(App)
 }).$mount('#app')

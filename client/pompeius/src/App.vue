@@ -12,7 +12,7 @@ export default {
   name: 'app',
   components: {
     CompetitionDashboard
-  }
+  },
 }
 </script>
 
