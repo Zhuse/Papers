@@ -1,70 +1,106 @@
 <template>
   <v-container>
     <v-row>
-      <v-col :cols="6">
-        <Editor v-model="userInput" @init="editorInit" lang="java" theme="chrome" width="580" height="500"></Editor>
+      <v-col :cols="9">
+        <v-card>
+          <Editor
+            v-model="userInput"
+            @init="editorInit"
+            :lang="userLang"
+            :theme="theme"
+            :width="userWidth"
+            :height="userHeight"
+          ></Editor>
+        </v-card>
       </v-col>
-      <v-col :cols="6">
-        <Editor v-model="opponentInput" @init="editorInit" lang="java" theme="chrome" width="580" height="500" :options="opponentInputOptions"></Editor>
+      <v-col :cols="3">
+        <svg
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          class="blur-svg"
+        >
+          <defs>
+            <filter id="blur-filter">
+              <feGaussianBlur stdDeviation="10" />
+            </filter>
+          </defs>
+        </svg>
+        <v-card>
+          <div class="blur">
+            <Editor
+              v-model="opponentInput"
+              @init="editorInit"
+              :lang="opponentLang"
+              :theme="theme"
+              :width="opponentWidth"
+              :height="opponentHeight"
+              :options="opponentInputOptions"
+            ></Editor>
+          </div>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-import Editor from 'vue2-ace-editor';
+import Editor from "vue2-ace-editor";
 export default {
-  name: 'CompetitionDashboard',
-  data: function () {
+  name: "CompetitionDashboard",
+  data: function() {
     return {
-      userInput: '',
-      opponentInput: '',
+      userInput: "",
+      opponentInput: "",
       opponentInputOptions: {
         readOnly: true
-      }
+      },
+      io: null,
+      theme: "chrome",
+      userLang: "java",
+      opponentLang: "java",
+      userHeight: 500,
+      userWidth: 870,
+      opponentHeight: 250,
+      opponentWidth: 290
+    };
+  },
+  sockets: {
+    textUpdate: function(data) {
+      this.opponentInput = data;
     }
   },
   methods: {
-    editorInit: function () {
-      require('brace/ext/language_tools') //language extension prerequsite...
-      require('brace/mode/html')                
-      require('brace/mode/javascript')    //language
-      require('brace/mode/java')    //language
-      require('brace/mode/less')
-      require('brace/theme/chrome')
-      require('brace/snippets/javascript') //snippet
-    },
-
-    socketInit: function () {}
+    editorInit: function() {
+      require("brace/ext/language_tools"); //language extension prerequsite...
+      require("brace/mode/html");
+      require("brace/mode/javascript"); //language
+      require("brace/mode/java"); //language
+      require("brace/mode/less");
+      require("brace/theme/chrome");
+      require("brace/snippets/javascript"); //snippet
+    }
   },
   watch: {
-    userInput(data) {
-      this.opponentInput = data;
+    userInput() {
+      this.$socket.emit("textUpdate", this.userInput);
     }
   },
   components: {
     Editor
-  },
-  mounted(){
-
   }
-}
+};
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.blur {
+  filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='10');
+  -webkit-filter: url(#blur-filter);
+  filter: url(#blur-filter);
+  -webkit-filter: blur(3px);
+  filter: blur(3px);
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+.blur-svg {
+  display: none;
 }
 </style>
