@@ -5,7 +5,7 @@ module.exports.initializeSocketService = function(server) {
     newIO.on('connection', (socket) => {
         socket.on('textUpdate', (data) => {
             socket.broadcast.emit('textUpdate', data);
-        })
+        });
     })
 
 }
