@@ -57,7 +57,8 @@ export default {
         highlightActiveLine: false,
         highlightSelectedWord: false,
         cursorStyle: "ace",
-        selectionStyle: "text"
+        selectionStyle: "text",
+        fontSize: "4pt"
       },
       io: null,
       theme: "chrome",
