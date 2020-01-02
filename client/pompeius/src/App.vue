@@ -1,17 +1,22 @@
 <template>
   <div id="app">
-    <h1>Pompeius</h1>
+    <Header></Header>
     <CompetitionDashboard></CompetitionDashboard>
+    <CompileDashboard></CompileDashboard>
   </div>
 </template>
 
 <script>
+import Header from './components/Header.vue'
 import CompetitionDashboard from './components/CompetitionDashboard.vue'
+import CompileDashboard from './components/CompileDashboard.vue'
 
 export default {
   name: 'app',
   components: {
-    CompetitionDashboard
+    Header,
+    CompetitionDashboard,
+    CompileDashboard
   },
 }
 </script>
@@ -23,6 +28,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
