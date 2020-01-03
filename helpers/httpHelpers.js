@@ -13,7 +13,7 @@ module.exports.get = function (path) {
 module.exports.post = function (path, payload) {
     const options = {
         method: 'POST',
-        uri: process.env.JUDGE_URL + path + "?base64_encoded=true&wait=true",
+        url: process.env.JUDGE_URL + path + "?base64_encoded=true&wait=true",
         body: payload,
         json: true, // Automatically parses the JSON string in the response
     };

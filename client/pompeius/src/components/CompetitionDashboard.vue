@@ -45,6 +45,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import Editor from "vue2-ace-editor";
 export default {
   name: "CompetitionDashboard",
@@ -76,6 +77,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions('submission', [
+      'changeText'
+    ]),
     editorInit: function() {
       require("brace/ext/language_tools"); //language extension prerequsite...
       require("brace/mode/html");
@@ -90,6 +94,7 @@ export default {
   watch: {
     userInput() {
       this.$socket.emit("textUpdate", this.userInput);
+      this.changeText(this.userInput);
     }
   },
   components: {

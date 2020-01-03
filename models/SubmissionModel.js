@@ -13,7 +13,7 @@ const SubmissionSchema = new Schema({
   token: { type: String, required: true},
   compile_output: {type: String, default: null},
   message: { type: String, default: null},
-  runStatus: {
+  status: {
       id: { type: Number, required: true},
       description: { type: String, required: true}
   }

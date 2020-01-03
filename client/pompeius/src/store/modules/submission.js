@@ -19,6 +19,7 @@ const getters = {
 };
 
 export default {
+    namespaced: true,
     state: defaultState,
     getters,
     actions,

@@ -4,7 +4,6 @@ const opponentBox = document.getElementById("opponentInput");
 
 socket.on('connection', function(){
     socket.on('textUpdate', (data) => {
-        console.log(data);
         socket.broadcast.emit('textUpdate', data);
     })
 });
