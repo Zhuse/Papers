@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-app-bar dense bottom fixed>
+    <v-app-bar dense bottom fixed absolute>
       <v-spacer></v-spacer>
 
       <v-btn :loading="waitForResponse" v-on:click="submit">Submit</v-btn>
@@ -24,6 +24,7 @@ function base64toUTF8(base64Str) {
 function UTF8toBase64(UTF8Str) {
   return Buffer.from(UTF8Str).toString("base64")
 }
+
 export default {
   name: "CompileDashboard",
   data: function() {

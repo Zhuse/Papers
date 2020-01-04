@@ -1,27 +1,29 @@
 <template>
   <div id="app">
-    <div v-if="!getLoginStatus">
-      <Login></Login>
-    </div>
-    <div v-if="getLoginStatus">
-      <Header></Header>
-      <CompetitionDashboard></CompetitionDashboard>
-      <CompileDashboard></CompileDashboard>
-    </div>
+    <v-app>
+      <div v-if="!getLoginStatus">
+        <Login></Login>
+      </div>
+      <div v-else>
+        <Header></Header>
+        <CompetitionDashboard></CompetitionDashboard>
+        <CompileDashboard></CompileDashboard>
+      </div>
+    </v-app>
   </div>
 </template>
 
 <script>
-import * as axios from 'axios'
-import { mapGetters } from 'vuex'
-import Header from './components/Header.vue'
-import CompetitionDashboard from './components/CompetitionDashboard.vue'
-import CompileDashboard from './components/CompileDashboard.vue'
-import Login from './components/Login.vue'
-import constants from './constants'
+import * as axios from "axios";
+import { mapGetters } from "vuex";
+import Header from "./components/Header.vue";
+import CompetitionDashboard from "./components/CompetitionDashboard.vue";
+import CompileDashboard from "./components/CompileDashboard.vue";
+import Login from "./components/Login.vue";
+import constants from "./constants";
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
     Header,
     CompetitionDashboard,
@@ -29,20 +31,20 @@ export default {
     Login
   },
   computed: {
-    ...mapGetters('user', [
-      'getLoginStatus'
-    ])
+    ...mapGetters("user", ["getLoginStatus"])
   },
-  created () {
-    axios.defaults.baseURL = constants.NETWORK.SERVER_URL + ":" + constants.NETWORK.PORT;
-    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+  created() {
+    axios.defaults.baseURL =
+      constants.NETWORK.SERVER_URL + ":" + constants.NETWORK.PORT;
+    axios.defaults.headers.post["Content-Type"] =
+      "application/x-www-form-urlencoded";
   }
-}
+};
 </script>
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
