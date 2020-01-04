@@ -1,24 +1,20 @@
 <template>
   <v-sheet>
-    <v-row justify="end">
+    <v-row justify="end" no-gutters>
       <v-col :cols="5">
-        <ProblemDescription text="Problem description here"></ProblemDescription>
-      </v-col>
-      <v-col :cols="7">
-        <v-sheet :height="500">
-          <Editor v-model="userInput" @init="editorInit" :lang="userLang" :theme="theme"></Editor>
+        <v-sheet height="92vh">
+          <ProblemDescription text="Problem description here"></ProblemDescription>
         </v-sheet>
       </v-col>
-      <v-btn v-on:click="openDrawer">Open</v-btn>
+      <v-col :cols="7">
+        <v-sheet height="65vh">
+          <Editor v-model="userInput" @init="editorInit" :lang="userLang" :theme="theme"></Editor>
+        </v-sheet>
+        <CompileDashboard></CompileDashboard>
+        <v-btn v-on:click="openDrawer" class="opponent-view-btn" fab><v-icon>mdi-school</v-icon></v-btn>
+      </v-col>
     </v-row>
-    <v-navigation-drawer
-      v-model="showOpponent"
-      absolute
-      right
-      temporary
-      hide-overlay
-      height="400"
-    >
+    <v-navigation-drawer v-model="showOpponent" absolute right temporary hide-overlay height="400">
       <svg
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +48,9 @@
 /*eslint-disable*/
 import { mapActions } from "vuex";
 import Editor from "vue2-ace-editor";
-import ProblemDescription from './ProblemDescription.vue'
+import ProblemDescription from "./ProblemDescription.vue";
+import CompileDashboard from "./CompileDashboard.vue";
+
 export default {
   name: "CompetitionDashboard",
   data: function() {
@@ -106,7 +104,8 @@ export default {
   },
   components: {
     Editor,
-    ProblemDescription
+    ProblemDescription,
+    CompileDashboard
   }
 };
 </script>
@@ -134,5 +133,11 @@ export default {
 
 .v-navigation-drawer__border {
   border-radius: 50px;
+}
+
+.opponent-view-btn {
+  position: absolute;
+  right: 1vh;
+  top: 10vh;
 }
 </style>

@@ -1,11 +1,38 @@
 <template>
-  <div>
-    <v-app-bar dense bottom fixed absolute>
+  <div class="border-up">
+    <v-tabs background-color="secondary lighten-3" dense>
+      <v-tab>Output</v-tab>
       <v-spacer></v-spacer>
-
-      <v-btn :loading="waitForResponse" v-on:click="submit">Submit</v-btn>
-    </v-app-bar>
-    <v-alert v-model="responseReady" class="maintainFormatting">{{ execResponse }}</v-alert>
+      <v-container>
+        <v-row align="center">
+            <v-col :col="12">
+          <v-btn
+            :loading="waitForResponse"
+            v-on:click="submit"
+            class="vertical-center padding"
+            right
+            outlined
+            icon
+            color="white"
+          ><v-icon>mdi-send</v-icon></v-btn>
+          <v-btn
+            class="vertical-center padding"
+            right
+            outlined
+            icon
+            color="white"
+          ><v-icon>mdi-check</v-icon></v-btn>
+            </v-col>
+        </v-row>
+      </v-container>
+      <v-tab-item>
+        <v-card flat tile>
+          <v-container>
+            <v-textarea :label="execStatus" :value="execResponse" readonly outlined></v-textarea>
+          </v-container>
+        </v-card>
+      </v-tab-item>
+    </v-tabs>
   </div>
 </template>
 
@@ -22,7 +49,7 @@ function base64toUTF8(base64Str) {
 }
 
 function UTF8toBase64(UTF8Str) {
-  return Buffer.from(UTF8Str).toString("base64")
+  return Buffer.from(UTF8Str).toString("base64");
 }
 
 export default {
@@ -31,6 +58,7 @@ export default {
     return {
       waitForResponse: false,
       responseReady: false,
+      execStatus: null,
       execResponse: ""
     };
   },
@@ -48,15 +76,19 @@ export default {
           let responseData = response.data.data;
           this.waitForResponse = false;
           this.responseReady = true;
+          this.execStatus = null;
           let message = "";
           if (responseData.status.id != constants.ACCEPTED_SUBMISSION_STATUS) {
+            this.execStatus = "Compilation Error";
             message = responseData.compile_output || responseData.stderr;
           } else {
+            this.execStatus = "Accepted Submission";
             message = responseData.stdout;
           }
           this.execResponse = base64toUTF8(message);
         })
         .catch(() => {
+          this.execStatus = "Invalid Submission";
           this.waitForResponse = false;
           this.responseReady = true;
           this.execResponse = "Invalid Submission";
@@ -78,5 +110,18 @@ export default {
 <style scoped>
 .maintainFormatting {
   white-space: pre;
+}
+
+.vertical-center {
+  margin: 0;
+  top: 50%;
+  float: right;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.padding {
+  display: inline;
+  padding: 3px;
 }
 </style>
