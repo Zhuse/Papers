@@ -2,33 +2,59 @@
   <div class="border-up">
     <v-tabs background-color="secondary lighten-3" dense>
       <v-tab>Output</v-tab>
+      <v-tab>Test</v-tab>
       <v-spacer></v-spacer>
       <v-container>
         <v-row align="center">
-            <v-col :col="12">
-          <v-btn
-            :loading="waitForResponse"
-            v-on:click="submit"
-            class="vertical-center padding"
-            right
-            outlined
-            icon
-            color="white"
-          ><v-icon>mdi-send</v-icon></v-btn>
-          <v-btn
-            class="vertical-center padding"
-            right
-            outlined
-            icon
-            color="white"
-          ><v-icon>mdi-check</v-icon></v-btn>
-            </v-col>
+          <v-col :col="12">
+            <v-btn
+              :loading="waitForResponse"
+              v-on:click="submit"
+              class="vertical-center padding"
+              right
+              outlined
+              icon
+              color="white"
+              title="Submit code"
+            >
+              <v-icon>mdi-send</v-icon>
+            </v-btn>
+          </v-col>
         </v-row>
       </v-container>
       <v-tab-item>
+        <v-card flat tile max-height="20">
+          <v-container max-height="20">
+              <v-row>
+                  <v-col :cols="12">
+            <v-textarea
+              :label="execStatus"
+              :value="execResponse"
+              readonly
+              outlined
+            ></v-textarea>
+                  </v-col>
+              </v-row>
+          </v-container>
+        </v-card>
+      </v-tab-item>
+      <v-tab-item>
         <v-card flat tile>
           <v-container>
-            <v-textarea :label="execStatus" :value="execResponse" readonly outlined></v-textarea>
+            <v-row>
+              <v-col :cols="6">
+                <v-textarea label="stdin" :value="execResponse" :height="textAreaHeight" outlined></v-textarea>
+              </v-col>
+              <v-col :cols="6">
+                <v-textarea
+                  label="stdout"
+                  :value="execResponse"
+                  :height="textAreaHeight"
+                  readonly
+                  outlined
+                ></v-textarea>
+              </v-col>
+            </v-row>
           </v-container>
         </v-card>
       </v-tab-item>
@@ -59,7 +85,7 @@ export default {
       waitForResponse: false,
       responseReady: false,
       execStatus: null,
-      execResponse: ""
+      execResponse: "",
     };
   },
   methods: {

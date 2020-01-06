@@ -2,19 +2,30 @@
   <v-sheet>
     <v-row justify="end" no-gutters>
       <v-col :cols="5">
-        <v-sheet height="92vh">
+        <v-sheet height="93vh">
           <ProblemDescription text="Problem description here"></ProblemDescription>
         </v-sheet>
       </v-col>
       <v-col :cols="7">
-        <v-sheet height="65vh">
+        <v-sheet height="62vh">
           <Editor v-model="userInput" @init="editorInit" :lang="userLang" :theme="theme"></Editor>
         </v-sheet>
         <CompileDashboard></CompileDashboard>
-        <v-btn v-on:click="openDrawer" class="opponent-view-btn" fab><v-icon>mdi-school</v-icon></v-btn>
+        <v-btn v-on:click="openDrawer" title="View opponent's editor" class="opponent-view-btn" fab>
+          <v-icon>mdi-school</v-icon>
+        </v-btn>
       </v-col>
     </v-row>
-    <v-navigation-drawer v-model="showOpponent" absolute right temporary hide-overlay height="400">
+    <v-navigation-drawer
+      v-model="showOpponent"
+      absolute
+      right
+      temporary
+      floating
+      hide-overlay
+      height="300"
+      width="340"
+    >
       <svg
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
@@ -34,8 +45,8 @@
             @init="editorInit"
             :lang="opponentLang"
             :theme="theme"
-            :width="opponentWidth"
-            :height="opponentHeight"
+            width="100%"
+            height="300"
             :options="opponentInputOptions"
           ></Editor>
         </div>
@@ -70,8 +81,8 @@ export default {
       userLang: "java",
       opponentLang: "java",
       userHeight: 500,
-      opponentHeight: 250,
-      opponentWidth: 290,
+      opponentHeight: 300,
+      opponentWidth: 320,
       showOpponent: false
     };
   },
@@ -112,11 +123,11 @@ export default {
 
 <style scoped>
 .blur {
-  filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='3');
+  filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='2');
   -webkit-filter: url(#blur-filter);
   filter: url(#blur-filter);
-  -webkit-filter: blur(3px);
-  filter: blur(3px);
+  -webkit-filter: blur(2px);
+  filter: blur(2px);
 }
 .blur-svg {
   display: none;

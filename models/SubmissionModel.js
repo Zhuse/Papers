@@ -9,6 +9,7 @@ const SubmissionSchema = new Schema({
   time: { type: Number, default: null},
   memory: { type: Number, default: null},
   stderr: { type: String, default: null},
+  stdin: { type: String, default: null},
   stdout: { type: String, default: null},
   token: { type: String, required: true},
   compile_output: {type: String, default: null},

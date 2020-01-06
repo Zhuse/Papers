@@ -17,6 +17,7 @@ function SubmissionData(data) {
     this.time = data.time;
     this.memory = data.memory;
     this.stderr = data.stderr;
+    this.stdin = data.stdin;
     this.stdout = data.stdout;
     this.token = data.token;
     this.compile_output = data.compile_output;
@@ -93,10 +94,10 @@ exports.submissionStore = [
     body('user', 'User must not be empty').isLength({ min: 1 }).trim(),
     (req, res) => {
         try {
-            console.log(req.body)
             httpHelpers.post('/submissions', {
                 source_code: req.body.source_code,
-                language_id: req.body.language_id
+                language_id: req.body.language_id,
+                stdin: req.body.stdin
             })
                 .then((execResult) => {
                     const errors = validationResult(req);
@@ -104,6 +105,7 @@ exports.submissionStore = [
                         {
                             language_id: req.body.language_id,
                             source_code: req.body.source_code,
+                            stdin: req.body.stdin,
                             user: req.body.user,
                             time: execResult.time,
                             memory: execResult.memory,

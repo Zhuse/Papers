@@ -7,7 +7,7 @@
 const app = require('../app');
 const debug = require('debug')('rest-api-nodejs-mongodb:server');
 const http = require('http');
-const socketService = require('../services/socketService');
+const socketService = require('../services').socketService;
 
 /**
  * Get port from environment and store in Express.
