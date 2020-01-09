@@ -14,3 +14,6 @@ A platform were you can practice your coding skills by competing with other peop
 
 ## Purpose
 To learn how to design a scalable back-end with a non-trivial workload.
+
+
+Estimated Time of Completion: 2-3 weeks as of Jan 8th, 2020.
