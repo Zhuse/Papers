@@ -43,13 +43,12 @@
           <v-container>
             <v-row>
               <v-col :cols="6">
-                <v-textarea label="stdin" :value="execResponse" :height="textAreaHeight" outlined></v-textarea>
+                <v-textarea label="stdin" :value="execResponse" outlined></v-textarea>
               </v-col>
               <v-col :cols="6">
                 <v-textarea
                   label="stdout"
                   :value="execResponse"
-                  :height="textAreaHeight"
                   readonly
                   outlined
                 ></v-textarea>

@@ -57,7 +57,7 @@
 
 <script>
 /*eslint-disable*/
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import Editor from "vue2-ace-editor";
 import ProblemDescription from "./ProblemDescription.vue";
 import CompileDashboard from "./CompileDashboard.vue";
@@ -83,13 +83,25 @@ export default {
       userHeight: 500,
       opponentHeight: 300,
       opponentWidth: 320,
-      showOpponent: false
+      showOpponent: false,
+      match: null
     };
+  },
+  created () {
+    document.addEventListener('beforeunload', this.closeApp)
+    this.$socket.emit('userConnect', this.getUserInfo.id)
+    this.$socket.emit('autoMatch');
   },
   sockets: {
     textUpdate: function(data) {
       this.opponentInput = data;
+    },
+    matchInfo: function(match) {
+      this.match = match;
     }
+  },
+  computed: {
+    ...mapGetters("user", ["getUserInfo"]),
   },
   methods: {
     ...mapActions("submission", ["changeText"]),
@@ -105,6 +117,9 @@ export default {
     },
     openDrawer() {
       this.showOpponent = !this.showOpponent;
+    },
+    closeApp() {
+      this.$socket.emit("disconnect");
     }
   },
   watch: {
