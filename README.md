@@ -7,7 +7,7 @@ A platform were you can practice your coding skills by competing with other peop
 - Node.js w/ necessary frameworks for the RESTful API.
 - MongoDB to store user statistics and problems.
 - Redis w/ PUB/SUB to store in progress match states.
-- Coding judge (Judge0) dockerized and deployed on AWS.
+- Coding judge (Judge0) with dockerized workers. Deployed on AWS.
 
 ### Front-end
 - Vue.js w/ Vuex (state management), and Vuetify.
@@ -16,4 +16,4 @@ A platform were you can practice your coding skills by competing with other peop
 To learn how to design a scalable back-end with a non-trivial workload.
 
 
-Estimated Time of Completion: 2-3 weeks as of Jan 8th, 2020.
+Estimated Time to Completion: 2-3 weeks as of Jan 8th, 2020.
