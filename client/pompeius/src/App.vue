@@ -6,35 +6,56 @@
       </div>
       <div v-else>
         <Header></Header>
-        <CompetitionDashboard></CompetitionDashboard>
+        <div v-if="online">
+          <MainDashboard></MainDashboard>
+        </div>
+        <div v-if="inMatch">
+          <CompetitionDashboard></CompetitionDashboard>
+        </div>
       </div>
     </v-app>
   </div>
 </template>
 
 <script>
+/*eslint-disable*/
 import * as axios from "axios";
 import { mapGetters } from "vuex";
 import Header from "./components/Header.vue";
 import CompetitionDashboard from "./components/CompetitionDashboard.vue";
+import MainDashboard from "./components/MainDashboard.vue";
 import Login from "./components/Login.vue";
-import constants from "./constants";
+import { NETWORK, USER_STATUSES } from "./constants";
 
 export default {
   name: "app",
   components: {
     Header,
     CompetitionDashboard,
+    MainDashboard,
     Login
   },
   computed: {
-    ...mapGetters("user", ["getLoginStatus"])
+    ...mapGetters("user", ["getLoginStatus", "getUserStatus"]),
+    online() {
+      return this.getUserStatus === USER_STATUSES.ONLINE;
+    },
+    inMatch() {
+      console.log(this.getUserStatus)
+      return this.getUserStatus === USER_STATUSES.IN_MATCH;
+    }
   },
   created() {
     axios.defaults.baseURL =
-      constants.NETWORK.SERVER_URL + ":" + constants.NETWORK.PORT;
+      NETWORK.SERVER_URL + ":" + NETWORK.PORT;
     axios.defaults.headers.post["Content-Type"] =
       "application/x-www-form-urlencoded";
+    document.addEventListener('beforeunload', this.closeApp)
+  },
+  methods: {
+    closeApp() {
+      this.$socket.emit("disconnect");
+    }
   }
 };
 </script>

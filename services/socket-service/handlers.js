@@ -64,8 +64,8 @@ async function joinPendingMatch(matchesKey) {
                     })
                     remoteEmitPipe(pipe, matchId, 'match started')
                     await pipe.exec()
+                    return getMatchById(matchId);
 
-                    return getMatchById(matchId)
                 }
             }
         }
@@ -186,13 +186,17 @@ async function autoMatch(io) {
 
     const matchesKey = keys.matches
 
-    const match = (
-        await joinPendingMatch.call(this, matchesKey) ||
-        await createPendingMatch.call(this, matchesKey)
-    )
+    let match = await joinPendingMatch.call(this, matchesKey);
+
+    if (match) {
+        this.join(match.id);
+        io.in(match.id).emit('matchInfo', match);
+    } else {
+        match = await createPendingMatch.call(this, matchesKey)
+        this.join(match.id);
+    }
+
     this.match = match
-    this.join(match.id);
-    io.in(match.id).emit('matchInfo', match);
     subRedis.subscribe(match.id);
 }
 

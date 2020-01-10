@@ -61,6 +61,7 @@ import { mapGetters, mapActions } from "vuex";
 import Editor from "vue2-ace-editor";
 import ProblemDescription from "./ProblemDescription.vue";
 import CompileDashboard from "./CompileDashboard.vue";
+import { USER_STATUSES } from '../constants'
 
 export default {
   name: "CompetitionDashboard",
@@ -84,20 +85,11 @@ export default {
       opponentHeight: 300,
       opponentWidth: 320,
       showOpponent: false,
-      match: null
     };
-  },
-  created () {
-    document.addEventListener('beforeunload', this.closeApp)
-    this.$socket.emit('userConnect', this.getUserInfo.id)
-    this.$socket.emit('autoMatch');
   },
   sockets: {
     textUpdate: function(data) {
       this.opponentInput = data;
-    },
-    matchInfo: function(match) {
-      this.match = match;
     }
   },
   computed: {
@@ -117,9 +109,6 @@ export default {
     },
     openDrawer() {
       this.showOpponent = !this.showOpponent;
-    },
-    closeApp() {
-      this.$socket.emit("disconnect");
     }
   },
   watch: {

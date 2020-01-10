@@ -31,7 +31,8 @@
 
 <script>
 import * as axios from "axios";
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
+import { USER_STATUSES } from "../constants"
 export default {
   name: "Login",
   data: function() {
@@ -48,7 +49,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions("user", ["setLogin"]),
+    ...mapActions("user", ["setLogin", "setUserStatus"]),
     login() {
       if (!this.$refs.loginForm.validate()) {
         return;
@@ -68,10 +69,15 @@ export default {
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${responseData.token}`;
+          this.$socket.emit('userConnect', this.getUserInfo.id);
+          this.setUserStatus(USER_STATUSES.ONLINE);
         })
         .catch(() => {});
       // Parse errors
     }
+  },
+  computed: {
+    ...mapGetters("user", ["getUserInfo"])
   }
 };
 </script>

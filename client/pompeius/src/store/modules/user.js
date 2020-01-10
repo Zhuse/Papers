@@ -1,10 +1,13 @@
+const { USER_STATUSES } = require('../../constants')
 const defaultState = {
     loginStatus: false,
     userInfo: {
         email: '',
         id: '',
         authorizationToken: ''
-    }
+    },
+    userStatus: USER_STATUSES.DISCONNECTED,
+    match: null
 };
 
 const actions = {
@@ -14,6 +17,12 @@ const actions = {
     setLogout: ({ commit }) => {
         commit('LOGOUT');
     },
+    setUserStatus: ({ commit }, status) => {
+        commit('SET_STATUS', status);
+    },
+    setMatch: ({ commit }, match) => {
+        commit('SET_MATCH', match);
+    }
 };
 
 const mutations = {
@@ -28,12 +37,20 @@ const mutations = {
         state.id = '';
         state.authorizationToken = '';
         state.loginStatus = false;
+    },
+    'SET_STATUS': (state, status) => {
+        state.userStatus = status;
+    },
+    'SET_MATCH': (state, payload) => {
+        state.match = payload;
     }
 };
 
 const getters = {
     getLoginStatus: state => state.loginStatus,
-    getUserInfo: state => state.userInfo
+    getUserInfo: state => state.userInfo,
+    getUserStatus: state => state.userStatus,
+    getMatch: state => state.match
 };
 
 export default {

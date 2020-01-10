@@ -12,7 +12,6 @@ function addHandler(socket, io, event, { noMatch=false, noUser=false, user=false
             newArgs.push(io);
             callback.call(socket, ...newArgs);
         } catch (error) {
-            console.log(error)
             socket.emit('error', event, error.message);
         }
     })
