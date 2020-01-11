@@ -1,6 +1,6 @@
 const cryptoRandomString = require('crypto-random-string');
 const Redis = require('ioredis');
-const { matchStore } = require('../../controllers/MatchController');
+const { matchStore, matchFindById } = require('../../controllers/MatchController');
 const { getRandomProblem } = require('../../controllers/ProblemController');
 const { MATCH_STATUSES, USER_STATUSES } = require('./constants');
 const redis = new Redis(`${process.env.REDIS_URL}:${process.env.REDIS_PORT}`);
@@ -24,25 +24,20 @@ function textUpdate(data) {
     this.to(this.match.id).emit('textUpdate', data);
 }
 
-function finalizeMatch(match, io) {
+async function finalizeMatch(matchId, io) {
+    const match = await matchFindById(matchId);
     if (match.player1Score > match.player2Score) {
-        io.in(match.id).emit(`${match.player1} Wins!`);
+        io.in(match._id).emit('matchUpdates', `${match.player1} Wins!`);
     } else if (match.player1Score < match.player2Score) {
-        io.in(match.id).emit(`${match.player2} Wins!`);
+        io.in(match._id).emit('matchUpdates', `${match.player2} Wins!`);
     } else {
-        io.in(match.id).emit('Tie!');
+        io.in(match._id).emit('matchUpdates', 'Tie!');
     }
 }
-async function getMatchById(id) {
+async function getRedisMatchById(id) {
     const match = await redis.hgetall(keys.matches(id));
     if (match.id !== id) throw new Error('Match not found');
     return match;
-}
-
-async function getUserById(id) {
-    const user = await redis.hgetall(keys.users(id));
-    if (user.id !== id) throw new Error('User not found');
-    return user;
 }
 
 async function joinPendingMatch(matchesKey) {
@@ -68,7 +63,7 @@ async function joinPendingMatch(matchesKey) {
                     remoteEmitPipe(pipe, matchId, 'match started')
                     await pipe.exec()
 
-                    const match = await getMatchById(matchId);
+                    const match = await getRedisMatchById(matchId);
                     match.problem = await getRandomProblem();
                     await matchStore({
                         _id: matchId,
@@ -79,7 +74,7 @@ async function joinPendingMatch(matchesKey) {
                         started: match.started,
                         problem: match.problem
                     })
-                    
+
                     return match;
                 }
             }
@@ -96,7 +91,7 @@ async function userConnect(userId) {
 
 async function disconnect(msg, io) {
     if (this.user && this.match) {
-        await matchDisconnect.call(this);
+        await matchDisconnect.call(this, io);
         io.in(this.match.id).clients((err, clients) => {
             if (!err && clients.length === 0) {
                 subRedis.unsubscribe(this.match.id);
@@ -105,8 +100,8 @@ async function disconnect(msg, io) {
     }
 }
 
-async function matchDisconnect() {
-    const match = await getMatchById(this.match.id);
+async function matchDisconnect(io) {
+    const match = await getRedisMatchById(this.match.id);
     const matchKey = keys.matches(match.id);
     const matchStatus = match.status;
     const { player1, player2 } = match;
@@ -130,7 +125,8 @@ async function matchDisconnect() {
         case MATCH_STATUSES.PLAYER_ONE_FINISHED:
             if (this.user.id == player2) {
                 newStatus = MATCH_STATUSES.ALL_FINISHED
-                finalizeMatch(match, io);
+                finalizeMatch(match.id, io);
+                delMatch = true;
             }
             break;
         case MATCH_STATUSES.PLAYER_TWO_DISCONNECTED:
@@ -138,7 +134,8 @@ async function matchDisconnect() {
         case MATCH_STATUSES.PLAYER_TWO_FINISHED:
             if (this.user.id == player1) {
                 newStatus = MATCH_STATUSES.ALL_FINISHED;
-                finalizeMatch(match, io);
+                finalizeMatch(match.id, io);
+                delMatch = true;
             }
             break;
     }
@@ -150,33 +147,45 @@ async function matchDisconnect() {
     await pipe.exec();
 }
 
-async function finished() {
-    const match = await getMatchById(this.match.id);
+async function finished(io) {
+    const match = await getRedisMatchById(this.match.id);
+    const matchKey = keys.matches(match.id);
     const matchStatus = match.status;
-    const newStatus = matchStatus;
     const { player1, player2 } = match;
-
+    const pipe = redis.pipeline();
+    let newStatus = matchStatus;
+    let delMatch = false;
     switch (matchStatus) {
         case MATCH_STATUSES.MATCH_IN_PROG:
             if (this.user.id == player1) {
-                newStatus = MATCH_STATUSES.PLAYER_ONE_DISCONNECTED;
+                newStatus = MATCH_STATUSES.PLAYER_ONE_FINISHED;
             } else {
-                newStatus = MATCH_STATUSES.PLAYER_TWO_DISCONNECTED;
+                newStatus = MATCH_STATUSES.PLAYER_TWO_FINISHED;
             }
             break;
+        case MATCH_STATUSES.PLAYER_ONE_FINISHED:
         case MATCH_STATUSES.PLAYER_ONE_DISCONNECTED:
             if (this.user.id == player2) {
                 newStatus = MATCH_STATUSES.ALL_FINISHED
-                finalizeMatch(match);
+                finalizeMatch(match.id, io);
+                delMatch = true;
             }
             break;
+        case MATCH_STATUSES.PLAYER_TWO_FINISHED:
         case MATCH_STATUSES.PLAYER_TWO_DISCONNECTED:
             if (this.user.id == player1) {
                 newStatus = MATCH_STATUSES.ALL_FINISHED;
-                finalizeMatch(match);
+                finalizeMatch(match.id, io);
+                delMatch = true;
             }
             break;
     }
+    if (!delMatch) {
+        pipe.hmset(matchKey, {
+            status: newStatus
+        })
+    }
+    await pipe.exec();
 }
 
 async function createPendingMatch(matchesKey) {
@@ -220,5 +229,6 @@ module.exports = {
     textUpdate,
     matchDisconnect,
     disconnect,
-    userConnect
+    userConnect,
+    finished
 }

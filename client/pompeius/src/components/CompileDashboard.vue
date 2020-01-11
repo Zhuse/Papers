@@ -7,18 +7,28 @@
       <v-container>
         <v-row align="center">
           <v-col :col="12">
+              <v-btn
+              :loading="waitForResponse"
+              :disabled="finishedMatch"
+              v-on:click="finish"
+              class="vertical-center padding"
+              right
+              color="green lighten-2"
+              title="Finish"
+            >
+              Finish
+            </v-btn>
             <v-btn
               :loading="waitForResponse"
+              :disabled="finishedMatch"
               v-on:click="submit"
               class="vertical-center padding"
               right
-              outlined
-              icon
-              color="white"
+              color="green lighten-3"
               title="Submit code"
             >
-              <v-icon>mdi-send</v-icon>
-            </v-btn>
+              Submit
+            </v-btn> 
           </v-col>
         </v-row>
       </v-container>
@@ -85,7 +95,8 @@ export default {
       responseReady: false,
       execStatus: null,
       execResponse: "",
-      testStdin: ""
+      testStdin: "",
+      finishedMatch: false
     };
   },
   methods: {
@@ -121,6 +132,10 @@ export default {
           this.responseReady = true;
           this.execResponse = "Invalid Submission";
         });
+    },
+    finish () {
+        this.$socket.emit('finished');
+        this.finishedMatch = true;
     }
   },
   computed: {

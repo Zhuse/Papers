@@ -83,3 +83,7 @@ exports.matchStore = function (payload) {
     // Save match.
     return match.save(match);
 }
+
+exports.matchFindById = async function (id) {
+    return Match.findOne({ _id: id });
+}

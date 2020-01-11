@@ -1,5 +1,5 @@
 const io = require('socket.io');
-const { autoMatch, textUpdate, disconnect, matchDisconnect, userConnect } = require('./handlers');
+const { autoMatch, textUpdate, disconnect, matchDisconnect, userConnect, finished } = require('./handlers');
 
 function addHandler(socket, io, event, { noMatch=false, noUser=false, user=false, match=false }, callback) {
     socket.on(event, async (...args) => {
@@ -24,6 +24,7 @@ module.exports.initializeSocketService = function (server) {
         addHandler(socket, newIO, 'autoMatch', { user: true }, autoMatch);
         addHandler(socket, newIO, 'textUpdate', { match: true, user: true }, textUpdate);
         addHandler(socket, newIO, 'matchDisconnect', { match: true, user: true }, matchDisconnect)
+        addHandler(socket, newIO, 'finished', { match: true, user: true }, finished);
         addHandler(socket, newIO, 'disconnect', {}, disconnect);
     })
 }

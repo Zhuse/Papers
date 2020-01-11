@@ -1,5 +1,9 @@
 <template>
   <v-sheet>
+    <v-dialog v-model="matchDialog" scrollable max-width="300px">
+      <v-card :height="300">
+        <v-card-text>{{ matchUpdateMsg }}</v-card-text></v-card>
+    </v-dialog>
     <v-row justify="end" no-gutters>
       <v-col :cols="5">
         <v-sheet height="93vh">
@@ -94,17 +98,23 @@ export default {
       userHeight: 500,
       opponentHeight: 300,
       opponentWidth: 320,
-      showOpponent: false
+      showOpponent: false,
+      matchDialog: false,
+      matchUpdateMsg: ""
     };
   },
   sockets: {
     textUpdate: function(data) {
       this.opponentInput = data;
+    },
+    matchUpdates: function(alert) {
+      this.matchDialog = true;
+      this.matchUpdateMsg = alert;
     }
   },
   computed: {
     ...mapGetters("user", ["getUserInfo", "getMatch"]),
-    getProblemDescription () {
+    getProblemDescription() {
       return this.getMatch.problem.description;
     }
   },
