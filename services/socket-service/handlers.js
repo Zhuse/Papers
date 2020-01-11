@@ -1,4 +1,4 @@
-const ulid = require('ulid').ulid
+const cryptoRandomString = require('crypto-random-string');
 const Redis = require('ioredis');
 const { matchStore } = require('../../controllers/MatchController');
 const { MATCH_STATUSES, USER_STATUSES } = require('./constants');
@@ -178,7 +178,7 @@ async function finished() {
 
 async function createPendingMatch(matchesKey) {
     const match = {
-        id: ulid(),
+        id: cryptoRandomString(24),
         player1: this.user.id,
         player1Score: 0,
         created: new Date(),

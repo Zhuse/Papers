@@ -95,7 +95,8 @@ export default {
         .post("/api/submission", {
           user: this.getUserId,
           source_code: UTF8toBase64(this.editorText),
-          language_id: 27
+          language_id: 27,
+          match: this.getMatchId
         })
         .then(response => {
           let responseData = response.data.data;
@@ -122,9 +123,12 @@ export default {
   },
   computed: {
     ...mapState("submission", ["editorText"]),
-    ...mapGetters("user", ["getUserInfo"]),
+    ...mapGetters("user", ["getUserInfo", "getMatch"]),
     getUserId() {
       return this.getUserInfo.id;
+    },
+    getMatchId() {
+        return this.getMatch.id;
     }
   },
   watch: {},

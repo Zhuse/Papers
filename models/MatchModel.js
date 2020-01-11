@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const MatchSchema = new Schema({
-    _id: { type: String },
+    _id: { type: Schema.ObjectId, required: true },
     player1: { type: Schema.ObjectId, ref: 'User', required: true },
     player2: { type: Schema.ObjectId, ref: 'User', required: true },
     player1Score: { type: Number, required: true, default: 0 },
