@@ -1,50 +1,49 @@
 <template>
   <div class="border-up">
-    <v-tabs background-color="secondary lighten-3" dense>
+    <v-tabs background-color="secondary lighten-3" v-model="activeTab" dense>
       <v-tab>Output</v-tab>
       <v-tab>Test</v-tab>
       <v-spacer></v-spacer>
       <v-container>
         <v-row align="center">
           <v-col :col="12">
-              <v-btn
-              :loading="waitForResponse"
+            <v-btn
+              :loading="!finishedMatch && waitForResponse"
               :disabled="finishedMatch"
               v-on:click="finish"
               class="vertical-center padding"
               right
               color="green lighten-2"
               title="Finish"
-            >
-              Finish
-            </v-btn>
+            >Finish</v-btn>
             <v-btn
-              :loading="waitForResponse"
+              :loading="!finishedMatch && waitForResponse"
               :disabled="finishedMatch"
               v-on:click="submit"
               class="vertical-center padding"
               right
               color="green lighten-3"
               title="Submit code"
-            >
-              Submit
-            </v-btn> 
+            >Submit</v-btn>
+            <v-btn
+              :loading="waitForResponse"
+              v-on:click="execute"
+              class="vertical-center padding"
+              right
+              color="green lighten-4"
+              title="Test code"
+            >Test</v-btn>
           </v-col>
         </v-row>
       </v-container>
       <v-tab-item>
         <v-card flat tile max-height="20">
           <v-container max-height="20">
-              <v-row>
-                  <v-col :cols="12">
-            <v-textarea
-              :label="execStatus"
-              :value="execResponse"
-              readonly
-              outlined
-            ></v-textarea>
-                  </v-col>
-              </v-row>
+            <v-row>
+              <v-col :cols="12">
+                <v-textarea :label="submissionStatus" :value="submissionResponse" readonly outlined></v-textarea>
+              </v-col>
+            </v-row>
           </v-container>
         </v-card>
       </v-tab-item>
@@ -52,16 +51,11 @@
         <v-card flat tile>
           <v-container>
             <v-row>
-              <v-col :cols="6">
-                <v-textarea label="stdin" :value="testStdin" outlined></v-textarea>
+              <v-col :cols="5">
+                <v-textarea label="stdin" v-model="testStdin" outlined></v-textarea>
               </v-col>
-              <v-col :cols="6">
-                <v-textarea
-                  label="stdout"
-                  :value="execResponse"
-                  readonly
-                  outlined
-                ></v-textarea>
+              <v-col :cols="7">
+                <v-textarea label="stdout" :value="execResponse" readonly outlined></v-textarea>
               </v-col>
             </v-row>
           </v-container>
@@ -72,6 +66,7 @@
 </template>
 
 <script>
+/*eslint-disable */
 import * as axios from "axios";
 import { mapState, mapGetters } from "vuex";
 import constants from "../constants";
@@ -93,16 +88,17 @@ export default {
     return {
       waitForResponse: false,
       responseReady: false,
-      execStatus: null,
+      submissionStatus: null,
+      submissionResponse: "",
       execResponse: "",
       testStdin: "",
-      finishedMatch: false
+      finishedMatch: false,
+      activeTab: 2
     };
   },
   methods: {
     submit() {
       this.waitForResponse = true;
-
       axios
         .post("/api/submission", {
           user: this.getUserId,
@@ -115,27 +111,56 @@ export default {
           let responseData = response.data.data;
           this.waitForResponse = false;
           this.responseReady = true;
-          this.execStatus = null;
+          this.submissionStatus = null;
+          this.activeTab = 2;
           let message = "";
           if (responseData.status.id != constants.ACCEPTED_SUBMISSION_STATUS) {
-            this.execStatus = "Compilation Error";
+            this.submissionStatus = "Compilation Error";
             message = responseData.compile_output || responseData.stderr;
           } else {
-            this.execStatus = "Accepted Submission";
+            this.submissionStatus = "Accepted Submission";
+            message = responseData.stdout;
+          }
+          this.submissionResponse = base64toUTF8(message);
+        })
+        .catch(() => {
+          this.submissionStatus = "Invalid Submission";
+          this.activeTab = 2;
+          this.waitForResponse = false;
+          this.responseReady = true;
+          this.submissionResponse = "Invalid Submission";
+        });
+    },
+    execute() {
+      this.waitForResponse = true;
+      axios
+        .post("/api/execute", {
+          user: this.getUserId,
+          source_code: UTF8toBase64(this.editorText),
+          language_id: 27,
+          stdin: UTF8toBase64(this.testStdin)
+        })
+        .then(response => {
+          this.activeTab = 1;
+          let responseData = response.data.data;
+          this.waitForResponse = false;
+          let message = "";
+          if (responseData.status.id != constants.ACCEPTED_SUBMISSION_STATUS) {
+            message = responseData.compile_output || responseData.stderr;
+          } else {
             message = responseData.stdout;
           }
           this.execResponse = base64toUTF8(message);
         })
         .catch(() => {
-          this.execStatus = "Invalid Submission";
+          this.activeTab = 1;
           this.waitForResponse = false;
-          this.responseReady = true;
-          this.execResponse = "Invalid Submission";
+          this.execResponse = "Something went wrong";
         });
     },
-    finish () {
-        this.$socket.emit('finished');
-        this.finishedMatch = true;
+    finish() {
+      this.$socket.emit("finished");
+      this.finishedMatch = true;
     }
   },
   computed: {
@@ -145,10 +170,10 @@ export default {
       return this.getUserInfo.id;
     },
     getMatchId() {
-        return this.getMatch.id;
+      return this.getMatch.id;
     },
     getProblemId() {
-        return this.getMatch.problem._id;
+      return this.getMatch.problem._id;
     }
   },
   watch: {},
