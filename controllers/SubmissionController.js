@@ -3,6 +3,7 @@ const { sanitizeBody } = require('express-validator');
 const mongoose = require('mongoose');
 const Submission = require('../models/SubmissionModel');
 const Match = require('../models/MatchModel');
+const Problem = require('../models/ProblemModel');
 const apiResponse = require('../helpers/apiResponse');
 const auth = require('../middlewares/jwt');
 const httpHelpers = require('../helpers/httpHelpers');
@@ -27,13 +28,17 @@ function SubmissionData(data) {
     this.status = data.status;
 }
 
-function generateScore(matchStats, execResult) {
+function generateScore(match, execResult) {
     const factor = 10000;
     const hourInms = 60 * 60 * 1000;
-    const timeScore = Math.max(1 - ((Date.now() - matchStats.started.getTime()) / hourInms), 0);
-    const execScore = 1;
-    const memoryScore = 1;
-    return factor * (timeScore * 0.5 + execScore * 0.25 + memoryScore * 0.25);
+    const timeScore = Math.max(1 - ((Date.now() - match.started.getTime()) / hourInms), 0);
+    const execScore = Math.max(1 - (execResult.time / match.problem.parExec), 0);
+    const memoryScore = Math.max(1 - (execResult.memory / match.problem.parMem), 0);
+    const finalScore = factor * (timeScore * 0.4 + execScore * 0.3 + memoryScore * 0.3);
+    if (!execResult.stderr && !execResult.compile_output && execResult.status.id === 3) {
+        return finalScore;
+    }
+    return 0;
 }
 /**
  * Submission List.
@@ -110,10 +115,12 @@ exports.submissionStore = [
             if (!errors.isEmpty()) {
                 throw new Error('Something wrong happened. Please try again later.');
             }
+            const problem = await Problem.findById(req.body.problem);
             const execResult = await httpHelpers.post('/submissions', {
                 source_code: req.body.source_code,
                 language_id: req.body.language_id,
-                stdin: req.body.stdin
+                stdin: req.body.stdin,
+                expected_output: problem.expectedStdout
             })
             const submission = new Submission(
                 {
@@ -133,8 +140,8 @@ exports.submissionStore = [
                 }
             );
 
-            const matchStats = await Match.findOne({ _id: req.body.match });
-            const playerScore = (!execResult.stderr && !execResult.compile_output)? generateScore(matchStats, execResult): 0;
+            const match = await Match.findOne({ _id: req.body.match });
+            const playerScore = generateScore(match, execResult);
             // Determine the player number
             let matchP1 = await Match.findOne({$and: [{ _id: req.body.match }, { player1: req.body.user }]});
             let matchP2 = await Match.findOne({$and: [{ _id: req.body.match }, { player2: req.body.user }]});

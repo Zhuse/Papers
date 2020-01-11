@@ -43,7 +43,7 @@
           <v-container>
             <v-row>
               <v-col :cols="6">
-                <v-textarea label="stdin" :value="execResponse" outlined></v-textarea>
+                <v-textarea label="stdin" :value="testStdin" outlined></v-textarea>
               </v-col>
               <v-col :cols="6">
                 <v-textarea
@@ -85,6 +85,7 @@ export default {
       responseReady: false,
       execStatus: null,
       execResponse: "",
+      testStdin: ""
     };
   },
   methods: {
@@ -96,7 +97,8 @@ export default {
           user: this.getUserId,
           source_code: UTF8toBase64(this.editorText),
           language_id: 27,
-          match: this.getMatchId
+          match: this.getMatchId,
+          problem: this.getProblemId
         })
         .then(response => {
           let responseData = response.data.data;
@@ -129,6 +131,9 @@ export default {
     },
     getMatchId() {
         return this.getMatch.id;
+    },
+    getProblemId() {
+        return this.getMatch.problem._id;
     }
   },
   watch: {},

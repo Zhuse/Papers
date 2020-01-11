@@ -1,10 +1,7 @@
-const { body, validationResult } = require('express-validator');
-const { sanitizeBody } = require('express-validator');
 const mongoose = require('mongoose');
 const Match = require('../models/MatchModel');
 const apiResponse = require('../helpers/apiResponse');
 const auth = require('../middlewares/jwt');
-const httpHelpers = require('../helpers/httpHelpers');
 
 mongoose.set('useFindAndModify', false);
 
@@ -17,6 +14,7 @@ function MatchData(data) {
     this.player2Score = data.player2Score;
     this.started = data.started;
     this.ended = data.ended;
+    this.problem = data.problem;
 }
 
 /**
@@ -79,6 +77,7 @@ exports.matchStore = function (payload) {
             player2Score: payload.player2Score,
             started: payload.started,
             ended: payload.ended,
+            problem: payload.problem
         }
     );
     // Save match.

@@ -3,7 +3,7 @@
     <v-row justify="end" no-gutters>
       <v-col :cols="5">
         <v-sheet height="93vh">
-          <ProblemDescription text="Problem description here"></ProblemDescription>
+          <ProblemDescription :text="getProblemDescription"></ProblemDescription>
         </v-sheet>
       </v-col>
       <v-col :cols="7">
@@ -103,7 +103,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters("user", ["getUserInfo"])
+    ...mapGetters("user", ["getUserInfo", "getMatch"]),
+    getProblemDescription () {
+      return this.getMatch.problem.description;
+    }
   },
   methods: {
     ...mapActions("submission", ["changeText"]),

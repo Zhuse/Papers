@@ -1,6 +1,7 @@
 const cryptoRandomString = require('crypto-random-string');
 const Redis = require('ioredis');
 const { matchStore } = require('../../controllers/MatchController');
+const { getRandomProblem } = require('../../controllers/ProblemController');
 const { MATCH_STATUSES, USER_STATUSES } = require('./constants');
 const redis = new Redis(`${process.env.REDIS_URL}:${process.env.REDIS_PORT}`);
 const subRedis = new Redis(`${process.env.REDIS_URL}:${process.env.REDIS_PORT}`);
@@ -68,13 +69,15 @@ async function joinPendingMatch(matchesKey) {
                     await pipe.exec()
 
                     const match = await getMatchById(matchId);
+                    match.problem = await getRandomProblem();
                     await matchStore({
                         _id: matchId,
                         player1: match.player1,
                         player2: match.player2,
                         player1Score: match.player1Score,
                         player2Score: match.player2Score,
-                        started: match.started
+                        started: match.started,
+                        problem: match.problem
                     })
                     
                     return match;
