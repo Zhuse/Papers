@@ -6,6 +6,7 @@ const SubmissionSchema = new Schema({
   language_id: { type: Number, required: true },
   source_code: { type: String, required: true },
   user: { type: Schema.ObjectId, ref: 'User', required: true },
+  match: { type: Schema.ObjectId, ref: 'Match', required: true },
   time: { type: Number, default: null},
   memory: { type: Number, default: null},
   stderr: { type: String, default: null},
@@ -14,6 +15,7 @@ const SubmissionSchema = new Schema({
   token: { type: String, required: true},
   compile_output: {type: String, default: null},
   message: { type: String, default: null},
+  score: { type: Number, default: 0},
   status: {
       id: { type: Number, required: true},
       description: { type: String, required: true}

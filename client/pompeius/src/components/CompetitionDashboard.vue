@@ -8,7 +8,13 @@
       </v-col>
       <v-col :cols="7">
         <v-sheet height="62vh">
-          <Editor v-model="userInput" @init="editorInit" :lang="userLang" :theme="theme"></Editor>
+          <Editor
+            v-model="userInput"
+            @init="editorInit"
+            :lang="userLang"
+            :theme="theme"
+            :options="userInputOptions"
+          ></Editor>
         </v-sheet>
         <CompileDashboard></CompileDashboard>
         <v-btn v-on:click="openDrawer" title="View opponent's editor" class="opponent-view-btn" fab>
@@ -61,7 +67,7 @@ import { mapGetters, mapActions } from "vuex";
 import Editor from "vue2-ace-editor";
 import ProblemDescription from "./ProblemDescription.vue";
 import CompileDashboard from "./CompileDashboard.vue";
-import { USER_STATUSES } from '../constants'
+import { USER_STATUSES } from "../constants";
 
 export default {
   name: "CompetitionDashboard",
@@ -75,7 +81,11 @@ export default {
         highlightSelectedWord: false,
         cursorStyle: "ace",
         selectionStyle: "text",
-        fontSize: "4pt"
+        fontSize: "4pt",
+        showPrintMargin: false
+      },
+      userInputOptions: {
+        showPrintMargin: false
       },
       io: null,
       theme: "chrome",
@@ -84,7 +94,7 @@ export default {
       userHeight: 500,
       opponentHeight: 300,
       opponentWidth: 320,
-      showOpponent: false,
+      showOpponent: false
     };
   },
   sockets: {
@@ -93,7 +103,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters("user", ["getUserInfo"]),
+    ...mapGetters("user", ["getUserInfo"])
   },
   methods: {
     ...mapActions("submission", ["changeText"]),

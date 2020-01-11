@@ -1,6 +1,7 @@
 const ulid = require('ulid').ulid
 const Redis = require('ioredis');
-const { MATCH_STATUSES, USER_STATUSES } = require('./constants')
+const { matchStore } = require('../../controllers/MatchController');
+const { MATCH_STATUSES, USER_STATUSES } = require('./constants');
 const redis = new Redis(`${process.env.REDIS_URL}:${process.env.REDIS_PORT}`);
 const subRedis = new Redis(`${process.env.REDIS_URL}:${process.env.REDIS_PORT}`);
 
@@ -62,10 +63,21 @@ async function joinPendingMatch(matchesKey) {
                         player2Score: 0,
                         started: new Date(),
                     })
+
                     remoteEmitPipe(pipe, matchId, 'match started')
                     await pipe.exec()
-                    return getMatchById(matchId);
 
+                    const match = await getMatchById(matchId);
+                    await matchStore({
+                        _id: matchId,
+                        player1: match.player1,
+                        player2: match.player2,
+                        player1Score: match.player1Score,
+                        player2Score: match.player2Score,
+                        started: match.started
+                    })
+                    
+                    return match;
                 }
             }
         }
@@ -115,7 +127,7 @@ async function matchDisconnect() {
         case MATCH_STATUSES.PLAYER_ONE_FINISHED:
             if (this.user.id == player2) {
                 newStatus = MATCH_STATUSES.ALL_FINISHED
-                finalizeMatch(match);
+                finalizeMatch(match, io);
             }
             break;
         case MATCH_STATUSES.PLAYER_TWO_DISCONNECTED:
@@ -123,7 +135,7 @@ async function matchDisconnect() {
         case MATCH_STATUSES.PLAYER_TWO_FINISHED:
             if (this.user.id == player1) {
                 newStatus = MATCH_STATUSES.ALL_FINISHED;
-                finalizeMatch(match);
+                finalizeMatch(match, io);
             }
             break;
     }
