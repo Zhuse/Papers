@@ -9,9 +9,11 @@
         <div v-if="online">
           <MainDashboard></MainDashboard>
         </div>
+        <v-fade-transition>
         <div v-if="inMatch">
           <CompetitionDashboard></CompetitionDashboard>
         </div>
+        </v-fade-transition>
       </div>
     </v-app>
   </div>

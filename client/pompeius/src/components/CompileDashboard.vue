@@ -37,51 +37,56 @@
         <span class="smallest-text">Finish</span>
       </v-btn>
     </v-sheet>
-    <v-sheet v-show="activeMenu == menuIdx.testMenu">
-      <v-container>
-        <v-row>
-          <v-col :cols="6">
-            <v-textarea label="stdin" v-model="testStdin" outlined></v-textarea>
-          </v-col>
-          <v-col :cols="6">
-            <v-textarea label="stdout" :value="execResponse" readonly outlined></v-textarea>
-          </v-col>
-        </v-row>
-        <v-btn
-          :disabled="finishedMatch || waitForResponse"
-          v-on:click="execute"
-          right
-          title="Execute code"
-          height="100%"
-          color="success"
-          outlined
-        >
-          <v-icon left small>mdi-eyedropper</v-icon>
-          <span class="smaller-text">Execute</span>
-        </v-btn>
-      </v-container>
-    </v-sheet>
-    <v-sheet v-show="activeMenu == menuIdx.submitMenu">
-      <v-container>
-        <v-row>
-          <v-col :cols="12">
-            <v-textarea :label="submissionStatus" :value="submissionResponse" readonly outlined></v-textarea>
-          </v-col>
-        </v-row>
-        <v-btn
-          :disabled="finishedMatch || waitForResponse"
-          v-on:click="submit"
-          right
-          title="Submit code"
-          height="100%"
-          color="success"
-          outlined
-        >
-          <v-icon left small>mdi-feather</v-icon>
-          <span class="smaller-text">Submit</span>
-        </v-btn>
-      </v-container>
-    </v-sheet>
+    <v-divider></v-divider>
+    <v-expand-transition hide-on-leave>
+      <v-sheet v-show="activeMenu == menuIdx.testMenu">
+        <v-container>
+          <v-row>
+            <v-col :cols="5">
+              <v-textarea label="stdin" v-model="testStdin" outlined></v-textarea>
+            </v-col>
+            <v-col :cols="7">
+              <v-textarea label="stdout" :value="execResponse" readonly outlined></v-textarea>
+            </v-col>
+          </v-row>
+          <v-btn
+            :disabled="finishedMatch || waitForResponse"
+            v-on:click="execute"
+            right
+            title="Execute code"
+            height="100%"
+            color="success"
+            outlined
+          >
+            <v-icon left small>mdi-eyedropper</v-icon>
+            <span class="smaller-text">Execute</span>
+          </v-btn>
+        </v-container>
+      </v-sheet>
+    </v-expand-transition>
+    <v-expand-transition hide-on-leave>
+      <v-sheet v-show="activeMenu == menuIdx.submitMenu">
+        <v-container>
+          <v-row>
+            <v-col :cols="12">
+              <v-textarea :label="submissionStatus" :value="submissionResponse" readonly outlined></v-textarea>
+            </v-col>
+          </v-row>
+          <v-btn
+            :disabled="finishedMatch || waitForResponse"
+            v-on:click="submit"
+            right
+            title="Submit code"
+            height="100%"
+            color="success"
+            outlined
+          >
+            <v-icon left small>mdi-feather</v-icon>
+            <span class="smaller-text">Submit</span>
+          </v-btn>
+        </v-container>
+      </v-sheet>
+    </v-expand-transition>
   </div>
 </template>
 

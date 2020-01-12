@@ -239,7 +239,7 @@ export default {
 .side-dashboard {
   position: absolute;
   right: 1vh;
-  top: 10vh;
+  top: 20vh;
 }
 .winner-score {
   color: forestgreen;
