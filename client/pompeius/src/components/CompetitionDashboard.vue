@@ -1,15 +1,43 @@
 <template>
   <v-sheet>
-    <v-row justify="end" no-gutters>
+    <v-dialog v-model="matchDialog" scrollable max-width="300px">
+      <v-card :height="300">
+        <v-card-text>
+          <div v-if="!isTie">
+            <b>{{ matchResult.winner }}</b> wins with a score of
+            <br />
+            <br />
+            <span class="winner-score">{{ matchResult.winnerScore }}</span>
+            <br />
+            <br />
+            {{ matchResult.loser }} score:
+            <b>{{ matchResult.loserScore }}</b>
+          </div>
+          <div v-else>
+            <b>Tie!</b> both players received a score of
+            <br />
+            <br />
+            <span class="winner-score">{{ matchResult.winnerScore }}</span>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-row justify="end">
       <v-col :cols="5">
-        <v-sheet height="93vh">
-          <ProblemDescription text="Problem description here"></ProblemDescription>
-        </v-sheet>
+        <v-card height="93vh">
+          <ProblemDescription :text="getProblemDescription"></ProblemDescription>
+        </v-card>
       </v-col>
       <v-col :cols="7">
-        <v-sheet height="62vh">
-          <Editor v-model="userInput" @init="editorInit" :lang="userLang" :theme="theme"></Editor>
-        </v-sheet>
+        <v-card height="60vh">
+          <Editor
+            v-model="userInput"
+            @init="editorInit"
+            :lang="userLang"
+            :theme="theme"
+            :options="userInputOptions"
+          ></Editor>
+        </v-card>
         <CompileDashboard></CompileDashboard>
         <v-btn v-on:click="openDrawer" title="View opponent's editor" class="opponent-view-btn" fab>
           <v-icon>mdi-school</v-icon>

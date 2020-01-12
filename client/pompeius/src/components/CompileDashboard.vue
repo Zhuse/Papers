@@ -1,14 +1,24 @@
 <template>
-  <div class="border-up">
-    <v-tabs background-color="secondary lighten-3" dense>
+    <v-tabs background-color="secondary lighten-3" v-model="activeTab" height="30px">
       <v-tab>Output</v-tab>
       <v-tab>Test</v-tab>
       <v-spacer></v-spacer>
       <v-container>
-        <v-row align="center">
+        <v-row align="center" no-gutters>
           <v-col :col="12">
             <v-btn
-              :loading="waitForResponse"
+              :loading="!finishedMatch && waitForResponse"
+              :disabled="finishedMatch"
+              v-on:click="finish"
+              class="vertical-center padding"
+              right
+              color="green lighten-2"
+              title="Finish"
+              height="20px"
+            >Finish</v-btn>
+            <v-btn
+              :loading="!finishedMatch && waitForResponse"
+              :disabled="finishedMatch"
               v-on:click="submit"
               class="vertical-center padding"
               right
@@ -23,23 +33,18 @@
         </v-row>
       </v-container>
       <v-tab-item>
-        <v-card flat tile max-height="20">
-          <v-container max-height="20">
-              <v-row>
-                  <v-col :cols="12">
-            <v-textarea
-              :label="execStatus"
-              :value="execResponse"
-              readonly
-              outlined
-            ></v-textarea>
-                  </v-col>
-              </v-row>
+        <v-card height="100%">
+          <v-container>
+            <v-row>
+              <v-col :cols="12">
+                <v-textarea :label="submissionStatus" :value="submissionResponse" no-resize readonly outlined></v-textarea>
+              </v-col>
+            </v-row>
           </v-container>
         </v-card>
       </v-tab-item>
       <v-tab-item>
-        <v-card flat tile>
+        <v-card height="100%">
           <v-container>
             <v-row>
               <v-col :cols="6">
@@ -58,7 +63,6 @@
         </v-card>
       </v-tab-item>
     </v-tabs>
-  </div>
 </template>
 
 <script>
