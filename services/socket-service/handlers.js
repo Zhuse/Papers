@@ -107,7 +107,7 @@ async function matchDisconnect(io) {
     const { player1, player2 } = match;
     const pipe = redis.pipeline();
     let newStatus = matchStatus;
-    let delMatch = false
+    let delMatch = false;
     switch (matchStatus) {
         case MATCH_STATUSES.WAITING:
             pipe.hdel(keys.users(match.player1), ['matchId']);
@@ -139,6 +139,7 @@ async function matchDisconnect(io) {
             }
             break;
     }
+    io.in(match.id).emit('matchAlert', `${this.user.id} has disconnected from the match.`);
     if (!delMatch) {
         pipe.hmset(matchKey, {
             status: newStatus
@@ -180,6 +181,7 @@ async function finished(io) {
             }
             break;
     }
+    this.to(match.id).emit('matchAlert', `${this.user.id} has finished.`)
     if (!delMatch) {
         pipe.hmset(matchKey, {
             status: newStatus

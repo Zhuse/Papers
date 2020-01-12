@@ -2,7 +2,8 @@
   <v-sheet>
     <v-dialog v-model="matchDialog" scrollable max-width="300px">
       <v-card :height="300">
-        <v-card-text>{{ matchUpdateMsg }}</v-card-text></v-card>
+        <v-card-text>{{ matchUpdateMsg }}</v-card-text>
+      </v-card>
     </v-dialog>
     <v-row justify="end" no-gutters>
       <v-col :cols="5">
@@ -21,9 +22,36 @@
           ></Editor>
         </v-sheet>
         <CompileDashboard></CompileDashboard>
-        <v-btn v-on:click="openDrawer" title="View opponent's editor" class="opponent-view-btn" fab>
-          <v-icon>mdi-school</v-icon>
-        </v-btn>
+        <v-sheet class="side-dashboard">
+          <v-row dense>
+            <v-col>
+              <v-btn v-on:click="openDrawer" title="View opponent's editor" small fab>
+                <v-icon>mdi-account-group</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-tooltip v-model="showAlert" left>
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                    v-on:click="alertBtnEvent"
+                    title="Show alert"
+                    :class="showAlertBtn? null: 'd-none'"
+                    small
+                    fab
+                  >
+                    <v-icon
+                      :large="showAlert? false: true"
+                      :color="showAlert? 'black':'orange darken-1'"
+                    >{{ showAlert? 'mdi-window-close': 'mdi-alert-circle-outline'}}</v-icon>
+                  </v-btn>
+                </template>
+                <span>{{ matchAlertMsg }}</span>
+              </v-tooltip>
+            </v-col>
+          </v-row>
+        </v-sheet>
       </v-col>
     </v-row>
     <v-navigation-drawer
@@ -100,7 +128,10 @@ export default {
       opponentWidth: 320,
       showOpponent: false,
       matchDialog: false,
-      matchUpdateMsg: ""
+      matchUpdateMsg: "",
+      showAlert: false,
+      showAlertBtn: false,
+      matchAlertMsg: ""
     };
   },
   sockets: {
@@ -110,6 +141,10 @@ export default {
     matchUpdates: function(alert) {
       this.matchDialog = true;
       this.matchUpdateMsg = alert;
+    },
+    matchAlert: function(alert) {
+      this.showAlertBtn = true;
+      this.matchAlertMsg = alert;
     }
   },
   computed: {
@@ -132,6 +167,12 @@ export default {
     },
     openDrawer() {
       this.showOpponent = !this.showOpponent;
+    },
+    alertBtnEvent() {
+      if (this.showAlert) {
+        this.showAlertBtn = false;
+      }
+      this.showAlert = !this.showAlert;
     }
   },
   watch: {
@@ -172,8 +213,7 @@ export default {
 .v-navigation-drawer__border {
   border-radius: 50px;
 }
-
-.opponent-view-btn {
+.side-dashboard {
   position: absolute;
   right: 1vh;
   top: 10vh;
