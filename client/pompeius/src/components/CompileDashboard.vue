@@ -2,8 +2,8 @@
   <div>
     <v-sheet class="d-inline-flex flex-row justify-end align-center gutters">
       <v-btn
-        :loading="waitForResponse"
-        v-on:click="testMenu = true"
+        v-on:click="activeMenu == menuIdx.testMenu?
+        activeMenu = menuIdx.noMenu: activeMenu = menuIdx.testMenu"
         right
         class="ma-2"
         title="Test code"
@@ -14,9 +14,9 @@
         <v-icon small>mdi-eyedropper</v-icon>
       </v-btn>
       <v-btn
-        :loading="!finishedMatch && waitForResponse"
-        :disabled="finishedMatch"
-        v-on:click="submit"
+        :disabled="finishedMatch || waitForResponse"
+        v-on:click="activeMenu == menuIdx.submitMenu?
+        activeMenu = menuIdx.noMenu: activeMenu = menuIdx.submitMenu"
         right
         color="success"
         title="Submit code"
@@ -26,18 +26,61 @@
         <v-icon small>mdi-feather</v-icon>
       </v-btn>
       <v-btn
-        :loading="!finishedMatch && waitForResponse"
-        :disabled="finishedMatch"
+        :disabled="finishedMatch || waitForResponse"
         v-on:click="finish"
-        right
         title="Finish"
         height="70%"
         color="success"
         outlined
       >
         <v-icon left small>mdi-telegram</v-icon>
-        <span class="small-text">Finish</span>
+        <span class="smallest-text">Finish</span>
       </v-btn>
+    </v-sheet>
+    <v-sheet v-show="activeMenu == menuIdx.testMenu">
+      <v-container>
+        <v-row>
+          <v-col :cols="6">
+            <v-textarea label="stdin" v-model="testStdin" outlined></v-textarea>
+          </v-col>
+          <v-col :cols="6">
+            <v-textarea label="stdout" :value="execResponse" readonly outlined></v-textarea>
+          </v-col>
+        </v-row>
+        <v-btn
+          :disabled="finishedMatch || waitForResponse"
+          v-on:click="execute"
+          right
+          title="Execute code"
+          height="100%"
+          color="success"
+          outlined
+        >
+          <v-icon left small>mdi-eyedropper</v-icon>
+          <span class="smaller-text">Execute</span>
+        </v-btn>
+      </v-container>
+    </v-sheet>
+    <v-sheet v-show="activeMenu == menuIdx.submitMenu">
+      <v-container>
+        <v-row>
+          <v-col :cols="12">
+            <v-textarea :label="submissionStatus" :value="submissionResponse" readonly outlined></v-textarea>
+          </v-col>
+        </v-row>
+        <v-btn
+          :disabled="finishedMatch || waitForResponse"
+          v-on:click="submit"
+          right
+          title="Submit code"
+          height="100%"
+          color="success"
+          outlined
+        >
+          <v-icon left small>mdi-feather</v-icon>
+          <span class="smaller-text">Submit</span>
+        </v-btn>
+      </v-container>
     </v-sheet>
   </div>
 </template>
@@ -70,7 +113,13 @@ export default {
       execResponse: "",
       testStdin: "",
       finishedMatch: false,
-      testMenu: false
+      testMenu: false,
+      menuIdx: {
+        noMenu: 0,
+        testMenu: 1,
+        submitMenu: 2
+      },
+      activeMenu: 0
     };
   },
   methods: {
@@ -163,8 +212,12 @@ export default {
   white-space: pre;
 }
 
-.small-text {
+.smallest-text {
   font-size: 9px;
+}
+
+.smaller-text {
+  font-size: 10px;
 }
 
 .gutters > .v-btn {
