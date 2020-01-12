@@ -29,16 +29,21 @@
         </v-card>
       </v-col>
       <v-col :cols="7">
-        <v-card class="d-flex flex-column align-stretch" height="90vh">
-          <Editor
-            v-model="userInput"
-            @init="editorInit"
-            :lang="userLang"
-            :theme="theme"
-            :options="userInputOptions"
-          ></Editor>
-          <CompileDashboard></CompileDashboard>
-        </v-card>
+        <v-sheet class="d-flex flex-column align-stretch" height="90vh">
+          <v-card class="flex-grow-1">
+            <Editor
+              v-model="userInput"
+              @init="editorInit"
+              :lang="userLang"
+              :theme="theme"
+              :options="userInputOptions"
+            ></Editor>
+          </v-card>
+          <v-sheet height="2vh"></v-sheet>
+          <v-card class="flex-shrink-1">
+            <CompileDashboard></CompileDashboard>
+          </v-card>
+        </v-sheet>
         <v-sheet class="side-dashboard d-flex flex-column align-content-space-around">
           <v-btn v-on:click="openDrawer" title="View opponent's editor" small fab>
             <v-icon>mdi-account-group</v-icon>

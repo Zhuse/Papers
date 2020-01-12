@@ -1,6 +1,5 @@
 <template>
   <div>
-      <v-dialog v-model="testMenu"><v-card height="60vh"></v-card></v-dialog>
     <v-sheet class="d-inline-flex flex-row justify-end align-center gutters">
       <v-btn
         :loading="waitForResponse"
