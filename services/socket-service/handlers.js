@@ -26,13 +26,37 @@ function textUpdate(data) {
 
 async function finalizeMatch(matchId, io) {
     const match = await matchFindById(matchId);
+    let tie;
+    let winner;
+    let loser;
+    let winnerScore;
+    let loserScore;
     if (match.player1Score > match.player2Score) {
-        io.in(match._id).emit('matchUpdates', `${match.player1} Wins!`);
+        tie = false;
+        winner = match.player1;
+        loser = match.player2;
+        winnerScore = match.player1Score;
+        loserScore = match.player2Score;
     } else if (match.player1Score < match.player2Score) {
-        io.in(match._id).emit('matchUpdates', `${match.player2} Wins!`);
+        tie = false;
+        winner = match.player1;
+        loser = match.player2;
+        winnerScore = match.player2Score;
+        loserScore = match.player1Score;
     } else {
-        io.in(match._id).emit('matchUpdates', 'Tie!');
+        tie = true;
+        winner = match.player1;
+        loser = match.player2;
+        winnerScore = match.player1Score;
+        loserScore = match.player2Score;
     }
+    io.in(match._id).emit('matchUpdates', {
+        tie,
+        winner,
+        loser,
+        winnerScore,
+        loserScore
+    });
 }
 async function getRedisMatchById(id) {
     const match = await redis.hgetall(keys.matches(id));
@@ -126,7 +150,6 @@ async function matchDisconnect(io) {
             if (this.user.id == player2) {
                 newStatus = MATCH_STATUSES.ALL_FINISHED
                 finalizeMatch(match.id, io);
-                delMatch = true;
             }
             break;
         case MATCH_STATUSES.PLAYER_TWO_DISCONNECTED:
@@ -135,7 +158,6 @@ async function matchDisconnect(io) {
             if (this.user.id == player1) {
                 newStatus = MATCH_STATUSES.ALL_FINISHED;
                 finalizeMatch(match.id, io);
-                delMatch = true;
             }
             break;
     }
@@ -155,7 +177,6 @@ async function finished(io) {
     const { player1, player2 } = match;
     const pipe = redis.pipeline();
     let newStatus = matchStatus;
-    let delMatch = false;
     switch (matchStatus) {
         case MATCH_STATUSES.MATCH_IN_PROG:
             if (this.user.id == player1) {
@@ -169,7 +190,6 @@ async function finished(io) {
             if (this.user.id == player2) {
                 newStatus = MATCH_STATUSES.ALL_FINISHED
                 finalizeMatch(match.id, io);
-                delMatch = true;
             }
             break;
         case MATCH_STATUSES.PLAYER_TWO_FINISHED:
@@ -177,16 +197,13 @@ async function finished(io) {
             if (this.user.id == player1) {
                 newStatus = MATCH_STATUSES.ALL_FINISHED;
                 finalizeMatch(match.id, io);
-                delMatch = true;
             }
             break;
     }
     this.to(match.id).emit('matchAlert', `${this.user.id} has finished.`)
-    if (!delMatch) {
-        pipe.hmset(matchKey, {
-            status: newStatus
-        })
-    }
+    pipe.hmset(matchKey, {
+        status: newStatus
+    })
     await pipe.exec();
 }
 

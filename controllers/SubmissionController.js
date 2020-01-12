@@ -36,7 +36,7 @@ function generateScore(match, execResult) {
     const memoryScore = Math.max(1 - (execResult.memory / match.problem.parMem), 0);
     const finalScore = factor * (timeScore * 0.4 + execScore * 0.3 + memoryScore * 0.3);
     if (!execResult.stderr && !execResult.compile_output && execResult.status.id === 3) {
-        return finalScore;
+        return Math.round(finalScore);
     }
     return 0;
 }

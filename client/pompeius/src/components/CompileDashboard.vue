@@ -93,11 +93,7 @@ export default {
       execResponse: "",
       testStdin: "",
       finishedMatch: false,
-      tabKeys: {
-          output: 1,
-          test: 1
-      },
-      activeTab: this.tabKeys.output
+      activeTab: 2
     };
   },
   methods: {

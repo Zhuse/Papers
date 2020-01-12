@@ -2,7 +2,28 @@
   <v-sheet>
     <v-dialog v-model="matchDialog" scrollable max-width="300px">
       <v-card :height="300">
-        <v-card-text>{{ matchUpdateMsg }}</v-card-text>
+        <v-card-text>
+          <div v-if="!isTie">
+            <b>{{ matchResult.winner }}</b> wins with a score of
+            <br />
+            <br />
+            <span class="winner-score">
+              {{ matchResult.winnerScore }}
+            </span>
+            <br />
+            <br />
+            {{ matchResult.loser }} score:
+            <b>{{ matchResult.loserScore }}</b>
+          </div>
+          <div v-else>
+            <b>Tie!</b> both players received a score of
+            <br />
+            <br />
+            <span class="winner-score">
+              {{ matchResult.winnerScore }}
+            </span>
+          </div>
+        </v-card-text>
       </v-card>
     </v-dialog>
     <v-row justify="end" no-gutters>
@@ -119,6 +140,13 @@ export default {
       userInputOptions: {
         showPrintMargin: false
       },
+      matchResult: {
+        tie: false,
+        winner: null,
+        loser: null,
+        winnerScore: null,
+        loserScore: null
+      },
       io: null,
       theme: "chrome",
       userLang: "java",
@@ -128,7 +156,6 @@ export default {
       opponentWidth: 320,
       showOpponent: false,
       matchDialog: false,
-      matchUpdateMsg: "",
       showAlert: false,
       showAlertBtn: false,
       matchAlertMsg: ""
@@ -138,9 +165,9 @@ export default {
     textUpdate: function(data) {
       this.opponentInput = data;
     },
-    matchUpdates: function(alert) {
+    matchUpdates: function(matchResult) {
       this.matchDialog = true;
-      this.matchUpdateMsg = alert;
+      this.matchResult = matchResult;
     },
     matchAlert: function(alert) {
       this.showAlertBtn = true;
@@ -151,6 +178,9 @@ export default {
     ...mapGetters("user", ["getUserInfo", "getMatch"]),
     getProblemDescription() {
       return this.getMatch.problem.description;
+    },
+    isTie() {
+      return this.matchResult.tie;
     }
   },
   methods: {
@@ -217,5 +247,9 @@ export default {
   position: absolute;
   right: 1vh;
   top: 10vh;
+}
+.winner-score {
+  color: forestgreen;
+  font-size: 36px;
 }
 </style>
