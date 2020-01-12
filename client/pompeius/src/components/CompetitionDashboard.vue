@@ -7,9 +7,7 @@
             <b>{{ matchResult.winner }}</b> wins with a score of
             <br />
             <br />
-            <span class="winner-score">
-              {{ matchResult.winnerScore }}
-            </span>
+            <span class="winner-score">{{ matchResult.winnerScore }}</span>
             <br />
             <br />
             {{ matchResult.loser }} score:
@@ -19,21 +17,19 @@
             <b>Tie!</b> both players received a score of
             <br />
             <br />
-            <span class="winner-score">
-              {{ matchResult.winnerScore }}
-            </span>
+            <span class="winner-score">{{ matchResult.winnerScore }}</span>
           </div>
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-row justify="end" no-gutters>
+    <v-row justify="end">
       <v-col :cols="5">
-        <v-sheet height="93vh">
+        <v-card height="90vh">
           <ProblemDescription :text="getProblemDescription"></ProblemDescription>
-        </v-sheet>
+        </v-card>
       </v-col>
       <v-col :cols="7">
-        <v-sheet height="62vh">
+        <v-card class="d-flex flex-column align-stretch" height="90vh">
           <Editor
             v-model="userInput"
             @init="editorInit"
@@ -41,37 +37,29 @@
             :theme="theme"
             :options="userInputOptions"
           ></Editor>
-        </v-sheet>
-        <CompileDashboard></CompileDashboard>
-        <v-sheet class="side-dashboard">
-          <v-row dense>
-            <v-col>
-              <v-btn v-on:click="openDrawer" title="View opponent's editor" small fab>
-                <v-icon>mdi-account-group</v-icon>
+          <CompileDashboard></CompileDashboard>
+        </v-card>
+        <v-sheet class="side-dashboard d-flex flex-column align-content-space-around">
+          <v-btn v-on:click="openDrawer" title="View opponent's editor" small fab>
+            <v-icon>mdi-account-group</v-icon>
+          </v-btn>
+          <v-tooltip v-model="showAlert" left>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                v-on:click="alertBtnEvent"
+                title="Show alert"
+                :class="showAlertBtn? null: 'd-none'"
+                small
+                fab
+              >
+                <v-icon
+                  :large="showAlert? false: true"
+                  :color="showAlert? 'black':'orange darken-1'"
+                >{{ showAlert? 'mdi-window-close': 'mdi-alert-circle-outline'}}</v-icon>
               </v-btn>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-tooltip v-model="showAlert" left>
-                <template v-slot:activator="{ on }">
-                  <v-btn
-                    v-on:click="alertBtnEvent"
-                    title="Show alert"
-                    :class="showAlertBtn? null: 'd-none'"
-                    small
-                    fab
-                  >
-                    <v-icon
-                      :large="showAlert? false: true"
-                      :color="showAlert? 'black':'orange darken-1'"
-                    >{{ showAlert? 'mdi-window-close': 'mdi-alert-circle-outline'}}</v-icon>
-                  </v-btn>
-                </template>
-                <span>{{ matchAlertMsg }}</span>
-              </v-tooltip>
-            </v-col>
-          </v-row>
+            </template>
+            <span>{{ matchAlertMsg }}</span>
+          </v-tooltip>
         </v-sheet>
       </v-col>
     </v-row>

@@ -1,67 +1,45 @@
 <template>
-  <div class="border-up">
-    <v-tabs background-color="secondary lighten-3" v-model="activeTab" dense>
-      <v-tab>Output</v-tab>
-      <v-tab>Test</v-tab>
-      <v-spacer></v-spacer>
-      <v-container>
-        <v-row align="center">
-          <v-col :col="12">
-            <v-btn
-              :loading="!finishedMatch && waitForResponse"
-              :disabled="finishedMatch"
-              v-on:click="finish"
-              class="vertical-center padding"
-              right
-              color="green lighten-2"
-              title="Finish"
-            >Finish</v-btn>
-            <v-btn
-              :loading="!finishedMatch && waitForResponse"
-              :disabled="finishedMatch"
-              v-on:click="submit"
-              class="vertical-center padding"
-              right
-              color="green lighten-3"
-              title="Submit code"
-            >Submit</v-btn>
-            <v-btn
-              :loading="waitForResponse"
-              v-on:click="execute"
-              class="vertical-center padding"
-              right
-              color="green lighten-4"
-              title="Test code"
-            >Test</v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-      <v-tab-item>
-        <v-card flat tile max-height="20">
-          <v-container max-height="20">
-            <v-row>
-              <v-col :cols="12">
-                <v-textarea :label="submissionStatus" :value="submissionResponse" readonly outlined></v-textarea>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card>
-      </v-tab-item>
-      <v-tab-item>
-        <v-card flat tile>
-          <v-container>
-            <v-row>
-              <v-col :cols="5">
-                <v-textarea label="stdin" v-model="testStdin" outlined></v-textarea>
-              </v-col>
-              <v-col :cols="7">
-                <v-textarea label="stdout" :value="execResponse" readonly outlined></v-textarea>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card>
-      </v-tab-item>
-    </v-tabs>
+  <div>
+      <v-dialog v-model="testMenu"><v-card height="60vh"></v-card></v-dialog>
+    <v-sheet class="d-inline-flex flex-row justify-end align-center gutters">
+      <v-btn
+        :loading="waitForResponse"
+        v-on:click="testMenu = true"
+        right
+        class="ma-2"
+        title="Test code"
+        height="70%"
+        color="success"
+        icon
+      >
+        <v-icon small>mdi-eyedropper</v-icon>
+      </v-btn>
+      <v-btn
+        :loading="!finishedMatch && waitForResponse"
+        :disabled="finishedMatch"
+        v-on:click="submit"
+        right
+        color="success"
+        title="Submit code"
+        height="70%"
+        icon
+      >
+        <v-icon small>mdi-feather</v-icon>
+      </v-btn>
+      <v-btn
+        :loading="!finishedMatch && waitForResponse"
+        :disabled="finishedMatch"
+        v-on:click="finish"
+        right
+        title="Finish"
+        height="70%"
+        color="success"
+        outlined
+      >
+        <v-icon left small>mdi-telegram</v-icon>
+        <span class="small-text">Finish</span>
+      </v-btn>
+    </v-sheet>
   </div>
 </template>
 
@@ -93,7 +71,7 @@ export default {
       execResponse: "",
       testStdin: "",
       finishedMatch: false,
-      activeTab: 2
+      testMenu: false
     };
   },
   methods: {
@@ -186,16 +164,11 @@ export default {
   white-space: pre;
 }
 
-.vertical-center {
-  margin: 0;
-  top: 50%;
-  float: right;
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
+.small-text {
+  font-size: 9px;
 }
 
-.padding {
-  display: inline;
-  padding: 3px;
+.gutters > .v-btn {
+  margin: 4px;
 }
 </style>
