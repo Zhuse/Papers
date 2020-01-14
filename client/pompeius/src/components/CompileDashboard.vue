@@ -43,10 +43,10 @@
         <v-container>
           <v-row>
             <v-col :cols="5">
-              <v-textarea label="stdin" v-model="testStdin" outlined></v-textarea>
+              <v-textarea label="stdin" v-model="testStdin" outlined dense></v-textarea>
             </v-col>
             <v-col :cols="7">
-              <v-textarea label="stdout" :value="execResponse" readonly outlined></v-textarea>
+              <v-textarea label="stdout" :value="execResponse" readonly outlined dense></v-textarea>
             </v-col>
           </v-row>
           <v-btn
@@ -69,7 +69,13 @@
         <v-container>
           <v-row>
             <v-col :cols="12">
-              <v-textarea :label="submissionStatus" :value="submissionResponse" readonly outlined></v-textarea>
+              <v-textarea
+                :label="submissionStatus"
+                :value="submissionResponse"
+                readonly
+                outlined
+                dense
+              ></v-textarea>
             </v-col>
           </v-row>
           <v-btn
@@ -91,7 +97,6 @@
 </template>
 
 <script>
-/*eslint-disable */
 import * as axios from "axios";
 import { mapState, mapGetters } from "vuex";
 import constants from "../constants";
@@ -227,5 +232,9 @@ export default {
 
 .gutters > .v-btn {
   margin: 4px;
+}
+
+.resizable {
+  resize: vertical;
 }
 </style>

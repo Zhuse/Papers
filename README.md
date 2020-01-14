@@ -1,4 +1,4 @@
-# Pompeius
+# Papers
 
 A platform were you can practice your coding skills by competing with other people!
 

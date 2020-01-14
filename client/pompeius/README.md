@@ -1,4 +1,4 @@
-# pompeius
+# Papers
 
 ## Project setup
 ```

@@ -1,7 +1,7 @@
 <template>
   <v-card color="white" class="header" flat tile>
     <v-toolbar dense min-height="7vh" max-height="7vh">
-      <v-toolbar-title>Pompeius</v-toolbar-title>
+      <v-toolbar-title>Papers</v-toolbar-title>
     </v-toolbar>
   </v-card>
 </template>

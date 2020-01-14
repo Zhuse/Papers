@@ -44,10 +44,11 @@
             ></Editor>
           </v-card>
         </v-sheet>
-        <v-sheet class="side-dashboard d-flex flex-column align-content-space-around">
+        <v-sheet class="side-dashboard d-flex flex-column align-content-space-between">
           <v-btn v-on:click="openDrawer" title="View opponent's editor" small fab>
             <v-icon>mdi-account-group</v-icon>
           </v-btn>
+          <br />
           <v-tooltip v-model="showAlert" left>
             <template v-slot:activator="{ on }">
               <v-btn
@@ -108,12 +109,10 @@
 </template>
 
 <script>
-/*eslint-disable*/
 import { mapGetters, mapActions } from "vuex";
 import Editor from "vue2-ace-editor";
 import ProblemDescription from "./ProblemDescription.vue";
 import CompileDashboard from "./CompileDashboard.vue";
-import { USER_STATUSES } from "../constants";
 
 export default {
   name: "CompetitionDashboard",
