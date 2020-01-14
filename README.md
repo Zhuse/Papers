@@ -1,4 +1,4 @@
-# Pompeius
+# Papers
 
 A platform were you can practice your coding skills by competing with other people!
 
@@ -16,4 +16,4 @@ A platform were you can practice your coding skills by competing with other peop
 To learn how to design a scalable back-end with a non-trivial workload.
 
 
-Estimated Time to Completion: 2-3 weeks as of Jan 8th, 2020.
+Estimated Time to Completion: 2 weeks as of Jan 13th, 2020.
