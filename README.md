@@ -45,10 +45,6 @@ Also will add notes here soon!
 
 MIT
 
-## Acknowledgments
-
-* The creators of some of the code I used
-
 ## Time to Completion
 
 2 Weeks from Jan 13th, 2020
