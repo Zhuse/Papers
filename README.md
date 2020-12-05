@@ -44,7 +44,3 @@ Also will add notes here soon!
 ## License
 
 MIT
-
-## Time to Completion
-
-2 Weeks from Jan 13th, 2020
