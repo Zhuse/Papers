@@ -1,7 +1,6 @@
 # Papers :page_facing_up:
 
 A platform were you can practice your coding skills by competing with other people! <br />
-**Still in Progress!**
 
 ![](images/PapersDemo.gif)
 
