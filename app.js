@@ -9,6 +9,10 @@ const indexRouter = require('./routes/index');
 const apiRouter = require('./routes/api');
 const apiResponse = require('./helpers/apiResponse');
 
+/* Swagger document setup */
+const swaggerUi = require('swagger-ui-express')
+const swaggerFile = require('./swagger_output.json')
+
 // DB connection
 const { MONGODB_URL } = process.env;
 
@@ -44,6 +48,7 @@ app.use(cors());
 // Route Prefixes
 app.use('/', indexRouter);
 app.use('/api/', apiRouter);
+app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 // throw 404 if URL not found
 app.all('*', (req, res) => apiResponse.notFoundResponse(res, 'Page not found'));

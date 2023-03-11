@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/server",
-    "dev": "nodemon ./bin/server",
+    "start": "node ./swagger.js && node ./bin/server",
+    "dev": "node ./swagger.js && nodemon ./bin/server",
     "test": "nyc _mocha --timeout 10000 --exit --report lcovonly -- -R spec",
-    "lint": "eslint --fix --config .eslintrc.json \"**/*.js\""
+    "lint": "eslint --fix --config .eslintrc.json \"**/*.js\"",
+    "swagger-autogen": "node ./swagger.js"
   },
   "dependencies": {
     "aws-sdk": "^2.596.0",
@@ -28,6 +29,8 @@
     "nodemailer": "^6.3.1",
     "redis": "^2.8.0",
     "socket.io": "^2.3.0",
+    "swagger-autogen": "^2.23.1",
+    "swagger-ui-express": "^4.6.2",
     "ulid": "^2.3.0"
   },
   "devDependencies": {
