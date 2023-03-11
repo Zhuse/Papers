@@ -33,7 +33,7 @@ exports.problemList = [
             });
         } catch (err) {
             // throw error in json response with status 500.
-            return apiResponse.ErrorResponse(res, err);
+            return apiResponse.errorResponse(res, err);
         }
     },
 ];
@@ -61,7 +61,7 @@ exports.problemDetail = [
             });
         } catch (err) {
             // throw error in json response with status 500.
-            return apiResponse.ErrorResponse(res, err);
+            return apiResponse.errorResponse(res, err);
         }
     },
 ];
@@ -106,14 +106,14 @@ exports.problemStore = [
 
             // Save problem.
             problem.save((err) => {
-                if (err) { return apiResponse.ErrorResponse(res, err); }
+                if (err) { return apiResponse.errorResponse(res, err); }
                 const problemData = new ProblemData(problem);
                 return apiResponse.successResponseWithData(res, 'Problem add Success.', problemData);
             });
         } catch (err) {
             console.log(err)
             // throw error in json response with status 500.
-            return apiResponse.ErrorResponse(res, err);
+            return apiResponse.errorResponse(res, err);
         }
     },
 ];
@@ -143,14 +143,14 @@ exports.problemDelete = [
                 // delete problem.
                 Problem.findByIdAndRemove(req.params.id, (err) => {
                     if (err) {
-                        return apiResponse.ErrorResponse(res, err);
+                        return apiResponse.errorResponse(res, err);
                     }
                     return apiResponse.successResponse(res, 'Problem delete Success.');
                 });
             });
         } catch (err) {
             // throw error in json response with status 500.
-            return apiResponse.ErrorResponse(res, err);
+            return apiResponse.errorResponse(res, err);
         }
     },
 ];

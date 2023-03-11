@@ -34,7 +34,7 @@ exports.matchList = [
             });
         } catch (err) {
             // throw error in json response with status 500.
-            return apiResponse.ErrorResponse(res, err);
+            return apiResponse.errorResponse(res, err);
         }
     },
 ];
@@ -62,7 +62,7 @@ exports.matchDetail = [
             });
         } catch (err) {
             // throw error in json response with status 500.
-            return apiResponse.ErrorResponse(res, err);
+            return apiResponse.errorResponse(res, err);
         }
     },
 ];

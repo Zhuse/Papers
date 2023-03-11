@@ -57,7 +57,7 @@ exports.submissionList = [
             });
         } catch (err) {
             // throw error in json response with status 500.
-            return apiResponse.ErrorResponse(res, err);
+            return apiResponse.errorResponse(res, err);
         }
     },
 ];
@@ -85,7 +85,7 @@ exports.submissionDetail = [
             });
         } catch (err) {
             // throw error in json response with status 500.
-            return apiResponse.ErrorResponse(res, err);
+            return apiResponse.errorResponse(res, err);
         }
     },
 ];
@@ -159,20 +159,20 @@ exports.submissionStore = [
                     { player2Score: Math.max(matchP2.player2Score, playerScore) });
             } else {
 
-                /** Match not found or player is somehow bother players in the same match */
+                /** Match not found or player is somehow both players in the same match */
                 throw new Error ('Something went really wrong.');
             }
 
             // Save submission.
             submission.save((err) => {
-                if (err) { return apiResponse.ErrorResponse(res, err); }
+                if (err) { return apiResponse.errorResponse(res, err); }
                 const submissionData = new SubmissionData(submission);
                 return apiResponse.successResponseWithData(res, 'Submission add Success.', submissionData);
             });
         } catch (err) {
             console.log(err)
             // throw error in json response with status 500.
-            return apiResponse.ErrorResponse(res, err);
+            return apiResponse.errorResponse(res, err);
         }
     },
 ];
@@ -202,14 +202,14 @@ exports.submissionDelete = [
                 // delete submission.
                 Submission.findByIdAndRemove(req.params.id, (err) => {
                     if (err) {
-                        return apiResponse.ErrorResponse(res, err);
+                        return apiResponse.errorResponse(res, err);
                     }
                     return apiResponse.successResponse(res, 'Submission delete Success.');
                 });
             });
         } catch (err) {
             // throw error in json response with status 500.
-            return apiResponse.ErrorResponse(res, err);
+            return apiResponse.errorResponse(res, err);
         }
     },
 ];

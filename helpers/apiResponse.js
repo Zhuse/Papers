@@ -15,7 +15,7 @@ exports.successResponseWithData = function (res, msg, data) {
   return res.status(200).json(resData);
 };
 
-exports.ErrorResponse = function (res, msg) {
+exports.errorResponse = function (res, msg) {
   const data = {
     status: 0,
     message: msg,

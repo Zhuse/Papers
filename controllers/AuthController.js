@@ -75,7 +75,7 @@ exports.register = [
         ).then(() => {
           // Save user.
           user.save((err) => {
-            if (err) { return apiResponse.ErrorResponse(res, err); }
+            if (err) { return apiResponse.errorResponse(res, err); }
             const userData = {
               _id: user._id,
               firstName: user.firstName,
@@ -86,12 +86,12 @@ exports.register = [
           });
         }).catch((err) => {
           console.log(err);
-          return apiResponse.ErrorResponse(res, err);
+          return apiResponse.errorResponse(res, err);
         });
       });
     } catch (err) {
       // throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.errorResponse(res, err);
     }
   }];
 
@@ -152,7 +152,7 @@ exports.login = [
         }
       });
     } catch (err) {
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.errorResponse(res, err);
     }
   }];
 
@@ -188,7 +188,7 @@ exports.verifyConfirm = [
               UserModel.findOneAndUpdate(query, {
                 isConfirmed: 1,
                 confirmOTP: null,
-              }).catch((err) => apiResponse.ErrorResponse(res, err));
+              }).catch((err) => apiResponse.errorResponse(res, err));
               return apiResponse.successResponse(res, 'Account confirmed success.');
             }
             return apiResponse.unauthorizedResponse(res, 'Otp does not match');
@@ -198,7 +198,7 @@ exports.verifyConfirm = [
         return apiResponse.unauthorizedResponse(res, 'Specified email not found.');
       });
     } catch (err) {
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.errorResponse(res, err);
     }
   }];
 
@@ -240,7 +240,7 @@ exports.resendConfirmOtp = [
               user.confirmOTP = otp;
               // Save user.
               user.save((err) => {
-                if (err) { return apiResponse.ErrorResponse(res, err); }
+                if (err) { return apiResponse.errorResponse(res, err); }
                 return apiResponse.successResponse(res, 'Confirm otp sent.');
               });
             });
@@ -252,6 +252,6 @@ exports.resendConfirmOtp = [
         }
       });
     } catch (err) {
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.errorResponse(res, err);
     }
   }];
