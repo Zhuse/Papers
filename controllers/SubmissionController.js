@@ -1,5 +1,4 @@
 const { body, validationResult } = require('express-validator');
-const { sanitizeBody } = require('express-validator');
 const mongoose = require('mongoose');
 const Submission = require('../models/SubmissionModel');
 const Match = require('../models/MatchModel');
@@ -7,8 +6,6 @@ const Problem = require('../models/ProblemModel');
 const apiResponse = require('../helpers/apiResponse');
 const auth = require('../middlewares/jwt');
 const httpHelpers = require('../helpers/httpHelpers');
-
-mongoose.set('useFindAndModify', false);
 
 // Submission Schema
 function SubmissionData(data) {
@@ -143,10 +140,10 @@ exports.submissionStore = [
             const match = await Match.findOne({ _id: req.body.match });
             const playerScore = generateScore(match, execResult);
             // Determine the player number
-            let matchP1 = await Match.findOne({$and: [{ _id: req.body.match }, { player1: req.body.user }]});
-            let matchP2 = await Match.findOne({$and: [{ _id: req.body.match }, { player2: req.body.user }]});
-            
-            
+            let matchP1 = await Match.findOne({ $and: [{ _id: req.body.match }, { player1: req.body.user }] });
+            let matchP2 = await Match.findOne({ $and: [{ _id: req.body.match }, { player2: req.body.user }] });
+
+
             if (matchP1 && !matchP2) {
 
                 /** Is player one */
@@ -160,15 +157,13 @@ exports.submissionStore = [
             } else {
 
                 /** Match not found or player is somehow both players in the same match */
-                throw new Error ('Something went really wrong.');
+                throw new Error('Something went really wrong.');
             }
 
             // Save submission.
-            submission.save((err) => {
-                if (err) { return apiResponse.errorResponse(res, err); }
-                const submissionData = new SubmissionData(submission);
-                return apiResponse.successResponseWithData(res, 'Submission add Success.', submissionData);
-            });
+            await submission.save()
+            const submissionData = new SubmissionData(submission);
+            return apiResponse.successResponseWithData(res, 'Submission add Success.', submissionData);
         } catch (err) {
             console.log(err)
             // throw error in json response with status 500.

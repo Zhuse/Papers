@@ -5,15 +5,15 @@ const Match = require('../models/MatchModel');
 const apiResponse = require('../helpers/apiResponse');
 const auth = require('../middlewares/jwt');
 
-mongoose.set('useFindAndModify', false);
-
 // Problem Schema
 function ProblemData(data) {
+    this.id = data._id
     this.stdinTest = data.stdinTest;
     this.description = data.description;
     this.parExec = data.parExec;
     this.parMem = data.parMem;
     this.expectedStdout = data.expectedStdout;
+    this.userSubmittedId = data.userSubmittedId;
 }
 
 /**
@@ -25,7 +25,7 @@ exports.problemList = [
     auth,
     function (req, res) {
         try {
-            Problem.find({ user: req.user._id }).then((problems) => {
+            Problem.find({ userSubmittedId: req.auth._id }).then((problems) => {
                 if (problems.length > 0) {
                     return apiResponse.successResponseWithData(res, 'Operation success', problems);
                 }
@@ -33,6 +33,7 @@ exports.problemList = [
             });
         } catch (err) {
             // throw error in json response with status 500.
+            console.log(err)
             return apiResponse.errorResponse(res, err);
         }
     },
@@ -47,20 +48,20 @@ exports.problemList = [
  */
 exports.problemDetail = [
     auth,
-    function (req, res) {
+    async function (req, res) {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return apiResponse.successResponseWithData(res, 'Operation success', {});
         }
         try {
-            Problem.findOne({ _id: req.params.id, user: req.user._id }).then((problem) => {
-                if (problem !== null) {
-                    const problemData = new ProblemData(problem);
-                    return apiResponse.successResponseWithData(res, 'Operation success', problemData);
-                }
-                return apiResponse.successResponseWithData(res, 'Operation success', {});
-            });
+            const problem = await Problem.findOne({ _id: req.params.id, userSubmittedId: req.auth._id})
+            if (problem !== null) {
+                const problemData = new ProblemData(problem);
+                return apiResponse.successResponseWithData(res, 'Operation success', problemData);
+            }
+            return apiResponse.notFoundResponse(res, 'Operation success');
         } catch (err) {
             // throw error in json response with status 500.
+            console.log(err)
             return apiResponse.errorResponse(res, err);
         }
     },
@@ -100,16 +101,54 @@ exports.problemStore = [
                     description: req.body.description,
                     parExec: req.body.parExec,
                     parMem: req.body.parMem,
-                    expectedStdout: req.body.expectedStdout
+                    expectedStdout: req.body.expectedStdout,
+                    userSubmittedId: req.auth._id
                 }
             );
 
             // Save problem.
-            problem.save((err) => {
-                if (err) { return apiResponse.errorResponse(res, err); }
-                const problemData = new ProblemData(problem);
-                return apiResponse.successResponseWithData(res, 'Problem add Success.', problemData);
-            });
+            await problem.save()
+            const problemData = new ProblemData(problem);
+            return apiResponse.successResponseWithData(res, 'Problem add Success.', problemData);
+
+        } catch (err) {
+            console.log(err)
+            // throw error in json response with status 500.
+            return apiResponse.errorResponse(res, err);
+        }
+    },
+];
+
+/**
+ * Update a problem.
+ *
+ * @param {string}      stdinTest
+ * @param {string}      description
+ * @param {string}      parExec
+ * @param {string}      parMem
+ * @param {string}      expectedStdout
+ * @returns {Object}
+ */
+exports.problemUpdate = [
+    auth,
+    async (req, res) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                throw new Error('Something wrong happened. Please try again later.');
+            }
+
+            // Update problem.
+            const updatedProblem = await Problem.findByIdAndUpdate(req.params.id, {
+                stdinTest: req.body.stdinTest,
+                description: req.body.description,
+                parExec: req.body.parExec,
+                parMem: req.body.parMem,
+                expectedStdout: req.body.expectedStdout
+            }, { new: true })
+            const problemData = new ProblemData(updatedProblem);
+            return apiResponse.successResponseWithData(res, 'Problem add Success.', problemData);
+
         } catch (err) {
             console.log(err)
             // throw error in json response with status 500.
@@ -150,6 +189,7 @@ exports.problemDelete = [
             });
         } catch (err) {
             // throw error in json response with status 500.
+            console.log(err)
             return apiResponse.errorResponse(res, err);
         }
     },

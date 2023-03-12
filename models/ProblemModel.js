@@ -6,7 +6,8 @@ const ProblemSchema = new Schema({
     description: { type: String, required: true},
     parExec: { type: Number, required: true},
     parMem: { type: Number, required: true},
-    expectedStdout: { type: String, required: true}
+    expectedStdout: { type: String, required: true},
+    userSubmittedId: { type: Schema.ObjectId, ref: 'User', required: true }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Problem', ProblemSchema);

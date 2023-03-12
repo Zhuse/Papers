@@ -1,5 +1,4 @@
 const { body, validationResult } = require('express-validator');
-const { sanitizeBody } = require('express-validator');
 // helper file to prepare responses.
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -37,10 +36,10 @@ exports.register = [
     })),
   body('password').isLength({ min: 6 }).trim().withMessage('Password must be 6 characters or greater.'),
   // Sanitize fields.
-  sanitizeBody('firstName').escape(),
-  sanitizeBody('lastName').escape(),
-  sanitizeBody('email').escape(),
-  sanitizeBody('password').escape(),
+  body('firstName').escape(),
+  body('lastName').escape(),
+  body('email').escape(),
+  body('password').escape(),
   // Process request after validation and sanitization.
   (req, res) => {
     try {
@@ -52,6 +51,7 @@ exports.register = [
       }
       // hash input password
       bcrypt.hash(req.body.password, 10, (err, hash) => {
+        if (err) throw err
         // generate OTP for confirmation
         const otp = utility.randomNumber(4);
         // Create User object with escaped and trimmed data
@@ -62,9 +62,8 @@ exports.register = [
             email: req.body.email,
             password: hash,
             confirmOTP: otp,
-          },
+          }
         );
-        // Html email body
         const html = `<p>Please Confirm your Account.</p><p>OTP: ${otp}</p>`;
         // Send confirmation email
         mailer.send(
@@ -72,18 +71,17 @@ exports.register = [
           req.body.email,
           'Confirm Account',
           html,
-        ).then(() => {
+        ).then(async () => {
           // Save user.
-          user.save((err) => {
-            if (err) { return apiResponse.errorResponse(res, err); }
-            const userData = {
-              _id: user._id,
-              firstName: user.firstName,
-              lastName: user.lastName,
-              email: user.email,
-            };
-            return apiResponse.successResponseWithData(res, 'Registration Success.', userData);
-          });
+          await user.save()
+          const userData = {
+            _id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+          };
+          return apiResponse.successResponseWithData(res, 'Registration Success.', userData);
+
         }).catch((err) => {
           console.log(err);
           return apiResponse.errorResponse(res, err);
@@ -108,8 +106,8 @@ exports.login = [
     .isEmail()
     .withMessage('Email must be a valid email address.'),
   body('password').isLength({ min: 1 }).trim().withMessage('Password must be specified.'),
-  sanitizeBody('email').escape(),
-  sanitizeBody('password').escape(),
+  body('email').escape(),
+  body('password').escape(),
   (req, res) => {
     try {
       const errors = validationResult(req);
@@ -161,8 +159,8 @@ exports.verifyConfirm = [
     .isEmail()
     .withMessage('Email must be a valid email address.'),
   body('otp').isLength({ min: 1 }).trim().withMessage('OTP must be specified.'),
-  sanitizeBody('email').escape(),
-  sanitizeBody('otp').escape(),
+  body('email').escape(),
+  body('otp').escape(),
   (req, res) => {
     try {
       const errors = validationResult(req);
@@ -175,7 +173,7 @@ exports.verifyConfirm = [
         // Check already confirm or not.
         if (user.isConfirmed) return apiResponse.unauthorizedResponse(res, 'Account already confirmed.');
         // Check account confirmation.
-        if (user.confirmOTP == req.body.otp) return apiResponse.unauthorizedResponse(res, 'Otp does not match');
+        if (user.confirmOTP !== req.body.otp) return apiResponse.unauthorizedResponse(res, 'OTP does not match');
         // Update user as confirmed
         UserModel.findOneAndUpdate(query, {
           isConfirmed: 1,
@@ -199,7 +197,7 @@ exports.resendConfirmOtp = [
   body('email').isLength({ min: 1 }).trim().withMessage('Email must be specified.')
     .isEmail()
     .withMessage('Email must be a valid email address.'),
-  sanitizeBody('email').escape(),
+  body('email').escape(),
   (req, res) => {
     try {
       const errors = validationResult(req);

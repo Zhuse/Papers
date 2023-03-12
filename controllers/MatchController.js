@@ -3,11 +3,9 @@ const Match = require('../models/MatchModel');
 const apiResponse = require('../helpers/apiResponse');
 const auth = require('../middlewares/jwt');
 
-mongoose.set('useFindAndModify', false);
-
 // Match Schema
 function MatchData(data) {
-    this._id = data._id;
+    this.id = data._id;
     this.player1 = data.player1;
     this.player2 = data.player2;
     this.player1Score = data.player1Score;

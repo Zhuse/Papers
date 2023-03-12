@@ -4,7 +4,6 @@ const apiResponse = require('../helpers/apiResponse');
 const auth = require('../middlewares/jwt');
 const httpHelpers = require('../helpers/httpHelpers');
 
-mongoose.set('useFindAndModify', false);
 /**
  * Execution store.
  *

@@ -1,4 +1,4 @@
-const cryptoRandomString = require('crypto-random-string');
+const crypto = require('crypto');
 const Redis = require('ioredis');
 const eloCalculator = require('elo-rating')
 const { matchStore, matchFindById } = require('../../controllers/MatchController');
@@ -225,7 +225,7 @@ async function finished(io) {
 
 async function createPendingMatch(matchesKey) {
     const match = {
-        id: cryptoRandomString(24),
+        id: crypto.randomBytes(64).toString('hex'),
         player1: this.user.id,
         player1Score: 0,
         created: new Date(),

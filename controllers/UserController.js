@@ -1,5 +1,4 @@
 const { body, validationResult } = require('express-validator');
-const { sanitizeBody } = require('express-validator');
 const auth = require('../middlewares/jwt');
 
 // helper file to prepare responses.
@@ -8,6 +7,7 @@ const UserModel = require('../models/UserModel');
 
 // Users Schema
 function UserData(data) {
+  this.id = data._id
   this.firstName = data.firstName
   this.lastName = data.lastName
   this.email = data.email
