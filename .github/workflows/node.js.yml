@@ -11,7 +11,9 @@ on:
 
 jobs:
   build:
-
+    env:
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        
     runs-on: ubuntu-latest
 
     strategy:
