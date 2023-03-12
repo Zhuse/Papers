@@ -26,9 +26,9 @@ exports.matchList = [
     auth,
     function (req, res) {
         try {
-            Match.find({ $or: [{ player1: req.user._id }, { player2: req.user._id }] }).then((matchs) => {
-                if (matchs.length > 0) {
-                    return apiResponse.successResponseWithData(res, 'Operation success', matchs);
+            Match.find({ $or: [{ player1: req.user._id }, { player2: req.user._id }] }).then((matches) => {
+                if (matches.length > 0) {
+                    return apiResponse.successResponseWithData(res, 'Operation success', matches);
                 }
                 return apiResponse.successResponseWithData(res, 'Operation success', []);
             });
@@ -43,7 +43,7 @@ exports.matchList = [
  * Match Detail.
  *
  * @param {string}      id
- *
+ * 
  * @returns {Object}
  */
 exports.matchDetail = [
@@ -53,7 +53,7 @@ exports.matchDetail = [
             return apiResponse.successResponseWithData(res, 'Operation success', {});
         }
         try {
-            Match.findOne({ $or: [{ player1: req.user._id }, { player2: req.user._id }] }).then((match) => {
+            Match.findOne({ $or: [{ player1: req.params.user_id }, { player2: req.user._id }] }).then((match) => {
                 if (match !== null) {
                     const matchData = new MatchData(match);
                     return apiResponse.successResponseWithData(res, 'Operation success', matchData);

@@ -134,7 +134,7 @@ exports.problemDelete = [
         try {
             Problem.findById(req.params.id, (err, foundProblem) => {
                 if (foundProblem === null) {
-                    return apiResponse.notFoundResponse(res, 'Problem not exists with this id');
+                    return apiResponse.notFoundResponse(res, 'Problem does not exists with this ID.');
                 }
                 // Check authorized user
                 if (foundProblem.user.toString() !== req.user._id) {

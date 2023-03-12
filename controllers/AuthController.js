@@ -64,7 +64,7 @@ exports.register = [
             confirmOTP: otp,
           },
         );
-          // Html email body
+        // Html email body
         const html = `<p>Please Confirm your Account.</p><p>OTP: ${otp}</p>`;
         // Send confirmation email
         mailer.send(
@@ -117,39 +117,31 @@ exports.login = [
         return apiResponse.validationErrorWithData(res, 'Validation Error.', errors.array());
       }
       UserModel.findOne({ email: req.body.email }).then((user) => {
-        if (user) {
-          // Compare given password with db's hash.
-          bcrypt.compare(req.body.password, user.password, (err, same) => {
-            if (same) {
-              // Check account confirmation.
-              if (user.isConfirmed) {
-                // Check User's account active or not.
-                if (user.status) {
-                  const userData = {
-                    _id: user._id,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email,
-                  };
-                    // Prepare JWT token for authentication
-                  const jwtPayload = userData;
-                  const jwtData = {
-                    expiresIn: process.env.JWT_TIMEOUT_DURATION,
-                  };
-                  const secret = process.env.JWT_SECRET;
-                  // Generated JWT token with Payload and secret.
-                  userData.token = jwt.sign(jwtPayload, secret, jwtData);
-                  return apiResponse.successResponseWithData(res, 'Login Success.', userData);
-                }
-                return apiResponse.unauthorizedResponse(res, 'Account is not active. Please contact admin.');
-              }
-              return apiResponse.unauthorizedResponse(res, 'Account is not confirmed. Please confirm your account.');
-            }
-            return apiResponse.unauthorizedResponse(res, 'Email or Password wrong.');
-          });
-        } else {
-          return apiResponse.unauthorizedResponse(res, 'Email or Password wrong.');
-        }
+        if (!user) return apiResponse.unauthorizedResponse(res, 'Email or Password wrong.');
+        // Compare given password with db's hash.
+        bcrypt.compare(req.body.password, user.password, (err, same) => {
+          if (!same) return apiResponse.unauthorizedResponse(res, 'Email or Password wrong.');
+          // Check account confirmation.
+          if (!user.isConfirmed) return apiResponse.unauthorizedResponse(res, 'Account is not confirmed. Please confirm your account.');
+          // Check User's account active or not.
+          if (!user.status) return apiResponse.unauthorizedResponse(res, 'Account is not active. Please contact admin.');
+
+          const userData = {
+            _id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+          };
+          // Prepare JWT token for authentication
+          const jwtPayload = userData;
+          const jwtData = {
+            expiresIn: process.env.JWT_TIMEOUT_DURATION,
+          };
+          const secret = process.env.JWT_SECRET;
+          // Generated JWT token with Payload and secret.
+          userData.token = jwt.sign(jwtPayload, secret, jwtData);
+          return apiResponse.successResponseWithData(res, 'Login Success.', userData);
+        });
       });
     } catch (err) {
       return apiResponse.errorResponse(res, err);
@@ -179,23 +171,17 @@ exports.verifyConfirm = [
       }
       const query = { email: req.body.email };
       UserModel.findOne(query).then((user) => {
-        if (user) {
-          // Check already confirm or not.
-          if (!user.isConfirmed) {
-            // Check account confirmation.
-            if (user.confirmOTP == req.body.otp) {
-              // Update user as confirmed
-              UserModel.findOneAndUpdate(query, {
-                isConfirmed: 1,
-                confirmOTP: null,
-              }).catch((err) => apiResponse.errorResponse(res, err));
-              return apiResponse.successResponse(res, 'Account confirmed success.');
-            }
-            return apiResponse.unauthorizedResponse(res, 'Otp does not match');
-          }
-          return apiResponse.unauthorizedResponse(res, 'Account already confirmed.');
-        }
-        return apiResponse.unauthorizedResponse(res, 'Specified email not found.');
+        if (!user) return apiResponse.unauthorizedResponse(res, 'Specified email not found.');
+        // Check already confirm or not.
+        if (user.isConfirmed) return apiResponse.unauthorizedResponse(res, 'Account already confirmed.');
+        // Check account confirmation.
+        if (user.confirmOTP == req.body.otp) return apiResponse.unauthorizedResponse(res, 'Otp does not match');
+        // Update user as confirmed
+        UserModel.findOneAndUpdate(query, {
+          isConfirmed: 1,
+          confirmOTP: null,
+        }).catch((err) => apiResponse.errorResponse(res, err));
+        return apiResponse.successResponse(res, 'Account confirmed success.');
       });
     } catch (err) {
       return apiResponse.errorResponse(res, err);
@@ -222,34 +208,27 @@ exports.resendConfirmOtp = [
       }
       const query = { email: req.body.email };
       UserModel.findOne(query).then((user) => {
-        if (user) {
-          // Check already confirm or not.
-          if (!user.isConfirmed) {
-            // Generate otp
-            const otp = utility.randomNumber(4);
-            // Html email body
-            const html = `<p>Please Confirm your Account.</p><p>OTP: ${otp}</p>`;
-            // Send confirmation email
-            mailer.send(
-              constants.confirmEmails.from,
-              req.body.email,
-              'Confirm Account',
-              html,
-            ).then(() => {
-              user.isConfirmed = 0;
-              user.confirmOTP = otp;
-              // Save user.
-              user.save((err) => {
-                if (err) { return apiResponse.errorResponse(res, err); }
-                return apiResponse.successResponse(res, 'Confirm otp sent.');
-              });
-            });
-          } else {
-            return apiResponse.unauthorizedResponse(res, 'Account already confirmed.');
-          }
-        } else {
-          return apiResponse.unauthorizedResponse(res, 'Specified email not found.');
-        }
+        if (!user) return apiResponse.unauthorizedResponse(res, 'Specified email not found.');
+        // Check already confirmed or not.
+        if (user.isConfirmed) return apiResponse.unauthorizedResponse(res, 'Account already confirmed.');
+        // Generate otp
+        const otp = utility.randomNumber(4);
+        // Html email body
+        // Send confirmation email
+        mailer.send(
+          constants.confirmEmails.from,
+          req.body.email,
+          'Confirm Account',
+          html,
+        ).then(() => {
+          user.isConfirmed = 0;
+          user.confirmOTP = otp;
+          // Save user.
+          user.save((err) => {
+            if (err) { return apiResponse.errorResponse(res, err); }
+            return apiResponse.successResponse(res, 'Confirm OTP sent.');
+          });
+        });
       });
     } catch (err) {
       return apiResponse.errorResponse(res, err);

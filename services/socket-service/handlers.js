@@ -1,11 +1,12 @@
 const cryptoRandomString = require('crypto-random-string');
 const Redis = require('ioredis');
+const eloCalculator = require('elo-rating')
 const { matchStore, matchFindById } = require('../../controllers/MatchController');
 const { getRandomProblem } = require('../../controllers/ProblemController');
+const { updateElo } = require('../../controllers/UserController');
 const { MATCH_STATUSES, USER_STATUSES } = require('./constants');
 const redis = new Redis(`${process.env.REDIS_URL}:${process.env.REDIS_PORT}`);
 const subRedis = new Redis(`${process.env.REDIS_URL}:${process.env.REDIS_PORT}`);
-
 const keys = {
     users: (id) => `u/${id}`,
     matches: (id) => `m/${id}`,
@@ -22,6 +23,14 @@ function remoteEmitPipe(pipe, matchId, type, ...args) {
 
 function textUpdate(data) {
     this.to(this.match.id).emit('textUpdate', data);
+}
+
+function calculateElo(p1Elo, p2Elo, player1Win) {
+    const newElos = eloCalculator.calculate(p1Elo, p2Elo, player1Win)
+    return {
+        p1Elo: newElos.playerRating,
+        p2Elo: newElos.opponentRating
+    }
 }
 
 async function finalizeMatch(matchId, io) {
@@ -49,6 +58,11 @@ async function finalizeMatch(matchId, io) {
         loser = match.player2;
         winnerScore = match.player1Score;
         loserScore = match.player2Score;
+    }
+
+    // Unless it was a tie, we need to update elo scores now.
+    if (!tie) {
+
     }
     io.in(match._id).emit('matchUpdates', {
         tie,
@@ -125,6 +139,7 @@ async function disconnect(msg, io) {
 }
 
 async function matchDisconnect(io) {
+
     const match = await getRedisMatchById(this.match.id);
     const matchKey = keys.matches(match.id);
     const matchStatus = match.status;
@@ -146,6 +161,7 @@ async function matchDisconnect(io) {
             break;
         case MATCH_STATUSES.PLAYER_ONE_DISCONNECTED:
             pipe.hdel(keys.users(match.player1), ['matchId']);
+            user
         case MATCH_STATUSES.PLAYER_ONE_FINISHED:
             if (this.user.id == player2) {
                 newStatus = MATCH_STATUSES.ALL_FINISHED
