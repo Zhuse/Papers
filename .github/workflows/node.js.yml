@@ -28,5 +28,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - name: Print JWT_SECRET value
+    - run: echo $JWT_SECRET
     - run: npm ci
     - run: npm run test
+    
